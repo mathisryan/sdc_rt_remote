@@ -3,11 +3,19 @@ var dbPassword = require('./database_env').dbPassword;
 
 const { Pool, Client } = require('pg');
 
+// const pool = new Pool({
+//   user: 'mysdc',
+//   host: dbHost,
+//   database: 'scorecard',
+//   password: dbPassword,
+//   port: 5432,
+// })
+
 const pool = new Pool({
-  user: 'mysdc',
-  host: dbHost,
+  user: 'postgres',
+  host: 'ec2-3-14-96-84.us-east-2.compute.amazonaws.com',
   database: 'scorecard',
-  password: dbPassword,
+  password: '1qazXSW!',
   port: 5432,
 })
 
