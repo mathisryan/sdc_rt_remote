@@ -1,3 +1,4 @@
+require('newrelic');
 const app = require('./app.js');
 const angular = require('static-angular');
 const options = {
