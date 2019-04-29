@@ -3,6 +3,7 @@ const express_static = require('express-static');
 const app = express();
 const db = require('./db/dbPostgresQuery');
 const cors = require('cors');
+require('newrelic');
 
 app.use(cors());
 app.use(express.static('loaderIO'));
