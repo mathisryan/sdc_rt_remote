@@ -5,7 +5,9 @@ const db = require('./db/dbPostgresQuery');
 const cors = require('cors');
 
 app.use(cors());
+app.use(express.static('loaderIO'));
 
+// app.get('/loaderio-4dc0697e93edcae700e5b45a0a9567ee.txt', db.getMovieInfobyID);
 app.get('/m/movieinfo/ID/:id', db.getMovieInfobyID);
 app.get('/m/movieinfo/name/:name', db.getMovieInfobyName);
 
