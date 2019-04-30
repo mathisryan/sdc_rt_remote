@@ -21,7 +21,7 @@ const pool = new Pool({
 
 const getMovieInfobyID = (request, response) => {
   console.log('ID', request.params.id);
-  const id = parseInt(request.params.id);
+  const id = request.params.id;
   pool.query('SELECT * FROM movies WHERE id = $1', [id], (error, results) => {
     if (error) {
       throw error
@@ -64,7 +64,7 @@ const getReviewInfobyID = (request, response) => {
 };
 
 const getReviewsbyID = (request, response) => {
-  const id = parseInt(request.params.id);
+  const id = request.params.id;
   pool.query('SELECT * FROM critic_reviews WHERE movie_id = $1', [id], (error, results) => {
     if (error) {
       throw error
@@ -106,7 +106,7 @@ const get12ReviewsbyName = (request, response) => {
 };
 
 const getTopReviewsbyID = (request, response) => {
-  const id = parseInt(request.params.id);
+  const id = request.params.id;
   const topC = 1;
   pool.query('SELECT * FROM critic_reviews JOIN critics ON (critic_reviews.critic_id = critics.id) ' +
     'WHERE critics.top_Critic = 1 AND critic_reviews.movie_id = $1', [id], (error, results) => {
