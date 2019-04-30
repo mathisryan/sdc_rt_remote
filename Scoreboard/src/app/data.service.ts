@@ -31,7 +31,7 @@ export class DataService {
     if (this.getTomotoObservable) {
       return this.getTomotoObservable;
     } else {
-      this.getTomotoObservable = this.http.get(`${environment.url}cr/tomotometer/${titleUrl}`).pipe(shareReplay());
+      this.getTomotoObservable = this.http.get(`${environment.url}cr/tomotometer/name/${titleUrl}`).pipe(shareReplay());
       return this.getTomotoObservable;
     }
   }
@@ -40,7 +40,7 @@ export class DataService {
     if (this.getTopCriticObservable) {
       return this.getTopCriticObservable;
     } else {
-      this.getTopCriticObservable = this.http.get(`${environment.url}cr/topcriticmeter/${titleUrl}`).pipe(shareReplay());
+      this.getTopCriticObservable = this.http.get(`${environment.url}cr/topcriticmeter/name/${titleUrl}`).pipe(shareReplay());
       return this.getTopCriticObservable;
     }
   }
@@ -58,7 +58,7 @@ export class DataService {
     if (this.getDozenReviewsObservable) {
       return this.getDozenReviewsObservable;
     } else {
-      this.getDozenReviewsObservable = this.http.get(`${environment.url}cr/topdozenreviews/${movieId}`).pipe(shareReplay());
+      this.getDozenReviewsObservable = this.http.get(`${environment.url}cr/topdozenreviews/ID/${movieId}`).pipe(shareReplay());
       return this.getDozenReviewsObservable;
     }
   }

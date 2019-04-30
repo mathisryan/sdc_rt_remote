@@ -34,6 +34,7 @@ export class CriticsComponent implements OnInit {
     this.data.getMovieInfo(this.titleUrl).subscribe(data => {
     this.title=data['title'];
     var movieId = data['id'];
+    console.log('DATA', data);
     console.log(movieId);
       //get reviews
       this.data.getDozenReviews(movieId).subscribe(data => {
