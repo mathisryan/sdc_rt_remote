@@ -106,12 +106,13 @@ export class AppComponent implements OnInit {
     }
 
     ngOnInit() {
-      var url = window.location.href;
-      if (url[url.length-1]==='/') {
-        url = url.substring(0,url.length-1);
-      }
-      var urlArray = url.split('/');
-      this.titleUrl = urlArray[urlArray.length-1];
+      // var url = window.location.href;
+      // if (url[url.length-1]==='/') {
+      //   url = url.substring(0,url.length-1);
+      // }
+      // var urlArray = url.split('/');
+      // this.titleUrl = urlArray[urlArray.length-1];
+      this.titleUrl = (Math.floor((Math.random() * 1000000) + 1)).toString();
 
       this.data.getMovieInfo(this.titleUrl).subscribe(data => {
         this.title=data['title'];
