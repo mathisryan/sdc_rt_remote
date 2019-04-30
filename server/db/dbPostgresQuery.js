@@ -20,6 +20,7 @@ const pool = new Pool({
 })
 
 const getMovieInfobyID = (request, response) => {
+  console.log('ID', request.params.id);
   const id = parseInt(request.params.id);
   pool.query('SELECT * FROM movies WHERE id = $1', [id], (error, results) => {
     if (error) {
