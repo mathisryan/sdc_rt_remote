@@ -86,13 +86,13 @@ export class AppComponent implements OnInit {
 
     getTomotoMeterScore() {
       this.data.getTomotometer(this.titleUrl).subscribe(data => {
-
-        this.tomotoMeter=Math.round(data['tomatometer']);
+        console.log('DATA', data);
+        this.tomotoMeter=Math.round(data['0']['tomatometer']);
         this.avgRating=data['avgrating'];
-        this.numReviews=data['numOfReviews'];
-        this.rotten = data['rotten'];
-        this.fresh = data['fresh'];
-        var aCriticReview = data['randomReview'].substring(0,137);
+        this.numReviews=data['0']['numOfReviews'];
+        this.rotten = data['0']['rotten'];
+        this.fresh = data['0']['fresh'];
+        var aCriticReview = data['0']['randomReview'].substring(0,137);
         this.criticConsensus = aCriticReview.substring(0, aCriticReview.lastIndexOf('.')+1);
 
         if (this.tomotoMeter > 75) {
@@ -115,12 +115,12 @@ export class AppComponent implements OnInit {
       this.titleUrl = (Math.floor((Math.random() * 1000000) + 1)).toString();
 
       this.data.getMovieInfo(this.titleUrl).subscribe(data => {
-        this.title=data['title'];
-        this.posterUrl=data['poster_url'];
-        this.backdropUrl=data['backdrop_url'];
-        this.videoUrlText = 'http://www.youtube.com/embed/' + data['video'];
+        this.title=data['0']['title'];
+        this.posterUrl=data['0']['poster_url'];
+        this.backdropUrl=data['0']['backdrop_url'];
+        this.videoUrlText = 'http://www.youtube.com/embed/' + data['0']['video'];
         this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.videoUrlText);
-        var movieId = data['id'];
+        var movieId = data['0']['id'];
         this.data.getUserReviewInfo(movieId).subscribe(data=> {
           this.usrScore=String(Math.round(data[0]['audienceScore'])) +'%';
           this.avgUsrRating= Math.round(data[0]['averageRating']*10)/10;
