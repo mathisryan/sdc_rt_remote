@@ -71,8 +71,8 @@ export class AppComponent implements OnInit {
         this.rotten = data['rotten'];
         this.fresh = data['fresh'];
 
-        var aCriticReview = data['randomReview'].substring(0,137);
-        this.criticConsensus = aCriticReview.substring(0, aCriticReview.lastIndexOf('.')+1);
+        var aCriticReview = Math.floor((Math.random() * data.length));
+        this.criticConsensus = data[aCriticReview]['review_text'];
 
         if (this.tomotoMeter > 75) {
           this.criticRatingImg = environment.cdn + 'assets/img/large-certified.png';

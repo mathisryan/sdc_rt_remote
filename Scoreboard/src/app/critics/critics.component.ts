@@ -32,12 +32,12 @@ export class CriticsComponent implements OnInit {
     // this.titleUrl = urlArray[urlArray.length-1];
     this.titleUrl = (Math.floor((Math.random() * 1000000) + 1)).toString();
     this.data.getMovieInfo(this.titleUrl).subscribe(data => {
-    this.title=data['0']['title'];
+    this.title = data['0']['title'];
     var movieId = data['0']['id'];
       //get reviews
       this.data.getDozenReviews(movieId).subscribe(data => {
         // console.log(data);
-        this.reviews = data['0'];
+        this.reviews = data;
       });
     });
 
