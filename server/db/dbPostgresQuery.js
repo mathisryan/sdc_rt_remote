@@ -53,7 +53,7 @@ const getCriticbyName = (request, response) => {
 };
 
 const getReviewInfobyID = (request, response) => {
-  const id = parseInt(request.params.id);
+  const id = request.params.id;
   pool.query('SELECT * FROM critic_reviews WHERE id = $1', [id], (error, results) => {
     if (error) {
       throw error
@@ -85,7 +85,7 @@ const getReviewsbyName = (request, response) => {
 };
 
 const get12ReviewsbyID = (request, response) => {
-  const id = parseInt(request.params.id);
+  const id = request.params.id;
   pool.query('SELECT * FROM critic_reviews WHERE movie_id = $1 LIMIT 12', [id], (error, results) => {
     if (error) {
       throw error
@@ -143,7 +143,7 @@ const createFilm = (request, response) => {
 }
 
 const updateFilmbyID = (request, response) => {
-  const id = parseInt(request.query.id);
+  const id = request.query.id;
   const { newTitle, newTitleURL, newPoster, newBackdrop } = request.query;
   pool.query(
     'UPDATE movies SET title = $2, title_url = $3, tmdb_poster_path = $4, tmdb_backdrop_path = $5 ' +
@@ -178,7 +178,7 @@ const updateFilmbyName = (request, response) => {
 }
 
 const deleteFilmbyID = (request, response) => {
-  const id = parseInt(request.params.id);
+  const id = request.params.id;
   pool.query('DELETE FROM movies WHERE id = $1 RETURNING *', [id], (error, results) => {
     if (error) {
       throw error
@@ -250,7 +250,7 @@ const createReview = (request, response) => {
 }
 
 const updateReview = (request, response) => {
-  const reviewID = parseInt(request.query.id);
+  const reviewID = request.query.id;
   const { newDate, fresh, reviewText, idFilm, idCrit, rating } = request.query;
   pool.query(
     'UPDATE critic_reviews SET review_date = $2, fresh = $3, review_text = $4, movie_id = $5, critic_id = $6, ' +
@@ -266,7 +266,7 @@ const updateReview = (request, response) => {
 }
 
 const deleteReview = (request, response) => {
-  const reviewID = parseInt(request.params.id);
+  const reviewID = request.params.id;
   pool.query('DELETE FROM critic_reviews WHERE id = $1 RETURNING *', [reviewID], (error, results) => {
     if (error) {
       throw error
