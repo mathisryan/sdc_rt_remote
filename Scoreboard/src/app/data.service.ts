@@ -22,7 +22,7 @@ export class DataService {
     if (this.getMovieInfoObservable) {
       return this.getMovieInfoObservable;
     } else {
-      this.getMovieInfoObservable = this.http.get(`${environment.url}m/movieinfo/name/${titleUrl}`).pipe(shareReplay());
+      this.getMovieInfoObservable = this.http.get(`${environment.url}m/movieinfo/name/:${titleUrl}`).pipe(shareReplay());
       return this.getMovieInfoObservable;
     }
   }
