@@ -121,8 +121,8 @@ var AppComponent = /** @class */ (function () {
             _this.numReviews = data['numOfReviews'];
             _this.rotten = data['rotten'];
             _this.fresh = data['fresh'];
-            var aCriticReview = data['randomReview'].substring(0, 137);
-            _this.criticConsensus = aCriticReview.substring(0, aCriticReview.lastIndexOf('.') + 1);
+            var aCriticReview = Math.floor((Math.random() * data.length));
+            _this.criticConsensus = data[aCriticReview]['review_text'];
             if (_this.tomotoMeter > 75) {
                 _this.criticRatingImg = src_environments_environment_prod__WEBPACK_IMPORTED_MODULE_2__["environment"].cdn + 'assets/img/large-certified.png';
             }
@@ -137,13 +137,14 @@ var AppComponent = /** @class */ (function () {
     AppComponent.prototype.getTomotoMeterScore = function () {
         var _this = this;
         this.data.getTomotometer(this.titleUrl).subscribe(function (data) {
-            _this.tomotoMeter = Math.round(data['tomatometer']);
+            console.log('DATA', data);
+            _this.tomotoMeter = Math.round(data['0']['tomatometer']);
             _this.avgRating = data['avgrating'];
-            _this.numReviews = data['numOfReviews'];
-            _this.rotten = data['rotten'];
-            _this.fresh = data['fresh'];
-            var aCriticReview = data['randomReview'].substring(0, 137);
-            _this.criticConsensus = aCriticReview.substring(0, aCriticReview.lastIndexOf('.') + 1);
+            _this.numReviews = data['0']['numOfReviews'];
+            _this.rotten = data['0']['rotten'];
+            _this.fresh = data['0']['fresh'];
+            var aCriticReview = Math.floor((Math.random() * data.length));
+            _this.criticConsensus = data[aCriticReview]['review_text'];
             if (_this.tomotoMeter > 75) {
                 _this.criticRatingImg = src_environments_environment_prod__WEBPACK_IMPORTED_MODULE_2__["environment"].cdn + 'assets/img/large-certified.png';
             }
@@ -157,19 +158,20 @@ var AppComponent = /** @class */ (function () {
     };
     AppComponent.prototype.ngOnInit = function () {
         var _this = this;
-        var url = window.location.href;
-        if (url[url.length - 1] === '/') {
-            url = url.substring(0, url.length - 1);
-        }
-        var urlArray = url.split('/');
-        this.titleUrl = urlArray[urlArray.length - 1];
+        // var url = window.location.href;
+        // if (url[url.length-1]==='/') {
+        //   url = url.substring(0,url.length-1);
+        // }
+        // var urlArray = url.split('/');
+        // this.titleUrl = urlArray[urlArray.length-1];
+        this.titleUrl = (Math.floor((Math.random() * 1000000) + 1)).toString();
         this.data.getMovieInfo(this.titleUrl).subscribe(function (data) {
-            _this.title = data['title'];
-            _this.posterUrl = data['poster_url'];
-            _this.backdropUrl = data['backdrop_url'];
-            _this.videoUrlText = 'http://www.youtube.com/embed/' + data['video'];
+            _this.title = data['0']['title'];
+            _this.posterUrl = data['0']['poster_url'];
+            _this.backdropUrl = data['0']['backdrop_url'];
+            _this.videoUrlText = 'http://www.youtube.com/embed/' + data['0']['video'];
             _this.videoUrl = _this.sanitizer.bypassSecurityTrustResourceUrl(_this.videoUrlText);
-            var movieId = data['id'];
+            var movieId = data['0']['id'];
             _this.data.getUserReviewInfo(movieId).subscribe(function (data) {
                 _this.usrScore = String(Math.round(data[0]['audienceScore'])) + '%';
                 _this.avgUsrRating = Math.round(data[0]['averageRating'] * 10) / 10;
@@ -306,29 +308,29 @@ var CriticsComponent = /** @class */ (function () {
     CriticsComponent.prototype.ngOnInit = function () {
         var _this = this;
         this.cdnUrl = src_environments_environment__WEBPACK_IMPORTED_MODULE_3__["environment"].cdn;
-        var url = window.location.href;
-        if (url[url.length - 1] === '/') {
-            url = url.substring(0, url.length - 1);
-        }
-        var urlArray = url.split('/');
-        this.titleUrl = urlArray[urlArray.length - 1];
+        // var url = window.location.href;
+        // if (url[url.length-1]==='/') {
+        //   url = url.substring(0,url.length-1);
+        // }
+        // var urlArray = url.split('/');
+        // this.titleUrl = urlArray[urlArray.length-1];
+        this.titleUrl = (Math.floor((Math.random() * 1000000) + 1)).toString();
         this.data.getMovieInfo(this.titleUrl).subscribe(function (data) {
-            _this.title = data['title'];
-            var movieId = data['id'];
-            console.log(movieId);
+            _this.title = data['0']['title'];
+            var movieId = data['0']['id'];
             //get reviews
             _this.data.getDozenReviews(movieId).subscribe(function (data) {
-                console.log(data);
+                // console.log(data);
                 _this.reviews = data;
             });
         });
         this.data.getTomotometer(this.titleUrl).subscribe(function (data) {
-            _this.numberOfReviews = data['numOfReviews'];
-            _this.numberOfFresh = data['fresh'];
-            _this.numberOfRotten = data['rotten'];
+            _this.numberOfReviews = data['0']['numOfReviews'];
+            _this.numberOfFresh = data['0']['fresh'];
+            _this.numberOfRotten = data['0']['rotten'];
         });
         this.data.getTopCriticScore(this.titleUrl).subscribe(function (data) {
-            _this.numberOfTopCritics = data['numOfReviews'];
+            _this.numberOfTopCritics = data['0']['numOfReviews'];
         });
     };
     CriticsComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
@@ -375,7 +377,7 @@ var DataService = /** @class */ (function () {
             return this.getMovieInfoObservable;
         }
         else {
-            this.getMovieInfoObservable = this.http.get(src_environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__["environment"].url + "m/movieinfo/" + titleUrl).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["shareReplay"])());
+            this.getMovieInfoObservable = this.http.get(src_environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__["environment"].url + "m/movieinfo/ID/" + titleUrl).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["shareReplay"])());
             return this.getMovieInfoObservable;
         }
     };
@@ -384,7 +386,7 @@ var DataService = /** @class */ (function () {
             return this.getTomotoObservable;
         }
         else {
-            this.getTomotoObservable = this.http.get(src_environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__["environment"].url + "cr/tomotometer/" + titleUrl).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["shareReplay"])());
+            this.getTomotoObservable = this.http.get(src_environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__["environment"].url + "cr/tomotometer/ID/" + titleUrl).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["shareReplay"])());
             return this.getTomotoObservable;
         }
     };
@@ -393,7 +395,7 @@ var DataService = /** @class */ (function () {
             return this.getTopCriticObservable;
         }
         else {
-            this.getTopCriticObservable = this.http.get(src_environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__["environment"].url + "cr/topcriticmeter/" + titleUrl).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["shareReplay"])());
+            this.getTopCriticObservable = this.http.get(src_environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__["environment"].url + "cr/topcriticmeter/ID/" + titleUrl).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["shareReplay"])());
             return this.getTopCriticObservable;
         }
     };
@@ -412,7 +414,7 @@ var DataService = /** @class */ (function () {
             return this.getDozenReviewsObservable;
         }
         else {
-            this.getDozenReviewsObservable = this.http.get(src_environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__["environment"].url + "cr/topdozenreviews/" + movieId).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["shareReplay"])());
+            this.getDozenReviewsObservable = this.http.get(src_environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__["environment"].url + "cr/topdozenreviews/ID/" + movieId).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["shareReplay"])());
             return this.getDozenReviewsObservable;
         }
     };
@@ -574,9 +576,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "environment", function() { return environment; });
 var environment = {
     production: true,
-    url: 'http://ec2-13-57-3-67.us-west-1.compute.amazonaws.com:9001/',
-    cdn: 'http://ddt6x6o76fn2g.cloudfront.net/',
-    usersUrl: 'http://ec2-34-200-239-184.compute-1.amazonaws.com:9003/'
+    url: '/',
+    // cdn: 'http://ddt6x6o76fn2g.cloudfront.net/',
+    cdn: '/',
+    usersUrl: 'http://ec2-3-14-111-112.us-east-2.compute.amazonaws.com:9003/'
 };
 
 
@@ -597,9 +600,9 @@ __webpack_require__.r(__webpack_exports__);
 // The list of file replacements can be found in `angular.json`.
 var environment = {
     production: false,
-    url: 'http://localhost:9001/',
-    // cdn: 'http://ddt6x6o76fn2g.cloudfront.net/',
-    usersUrl: 'http://localhost:9003/'
+    url: 'http://ec2-13-57-3-67.us-west-1.compute.amazonaws.com:9001/',
+    cdn: 'http://ddt6x6o76fn2g.cloudfront.net/',
+    usersUrl: 'http://ec2-34-200-239-184.compute-1.amazonaws.com:9003/'
 };
 /*
  * For easier debugging in development mode, you can import the following file
@@ -646,7 +649,7 @@ Object(_angular_platform_browser_dynamic__WEBPACK_IMPORTED_MODULE_1__["platformB
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\Users\Eric\front-end-capstone\Rotten_Tomatoes_Scoreboard_Service\Scoreboard\src\main.ts */"./src/main.ts");
+module.exports = __webpack_require__(/*! /Users/io/Code/GitHub/sdc_rt_remote/Scoreboard/src/main.ts */"./src/main.ts");
 
 
 /***/ })

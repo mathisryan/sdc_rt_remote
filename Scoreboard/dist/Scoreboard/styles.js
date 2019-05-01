@@ -557,7 +557,7 @@ if(false) {}
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\Users\Eric\front-end-capstone\Rotten_Tomatoes_Scoreboard_Service\Scoreboard\src\styles.css */"./src/styles.css");
+module.exports = __webpack_require__(/*! /Users/io/Code/GitHub/sdc_rt_remote/Scoreboard/src/styles.css */"./src/styles.css");
 
 
 /***/ })

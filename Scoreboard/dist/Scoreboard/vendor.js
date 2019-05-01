@@ -104,7 +104,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /**
- * @license Angular v7.2.6
+ * @license Angular v7.2.14
  * (c) 2010-2019 Google LLC. https://angular.io/
  * License: MIT
  */
@@ -221,12 +221,12 @@ var APP_BASE_HREF = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["InjectionTok
  *
  * A service that applications can use to interact with a browser's URL.
  *
- * Depending on which {@link LocationStrategy} is used, `Location` will either persist
+ * Depending on the {@link LocationStrategy} used, `Location` will either persist
  * to the URL's path or the URL's hash segment.
  *
  * @usageNotes
  *
- * It's better to use {@link Router#navigate} service to trigger route changes. Use
+ * It's better to use the {@link Router#navigate} service to trigger route changes. Use
  * `Location` only if you need to interact with or create normalized URLs outside of
  * routing.
  *
@@ -263,6 +263,10 @@ var Location = /** @class */ (function () {
     Location_1 = Location;
     /**
      * Returns the normalized URL path.
+     *
+     * @param includeHash Whether path has an anchor fragment.
+     *
+     * @returns The normalized URL path.
      */
     // TODO: vsavkin. Remove the boolean flag and always include hash once the deprecated router is
     // removed.
@@ -272,14 +276,24 @@ var Location = /** @class */ (function () {
     };
     /**
      * Normalizes the given path and compares to the current normalized path.
+     *
+     * @param path The given URL path
+     * @param query Query parameters
+     *
+     * @returns `true` if the given URL path is equal to the current normalized path, `false`
+     * otherwise.
      */
     Location.prototype.isCurrentPathEqualTo = function (path, query) {
         if (query === void 0) { query = ''; }
         return this.path() == this.normalize(path + Location_1.normalizeQueryParams(query));
     };
     /**
-     * Given a string representing a URL, returns the normalized URL path without leading or
+     * Given a string representing a URL, returns the URL path after stripping the
      * trailing slashes.
+     *
+     * @param url String representing a URL.
+     *
+     * @returns Normalized URL string.
      */
     Location.prototype.normalize = function (url) {
         return Location_1.stripTrailingSlash(_stripBaseHref(this._baseHref, _stripIndexHtml(url)));
@@ -287,8 +301,13 @@ var Location = /** @class */ (function () {
     /**
      * Given a string representing a URL, returns the platform-specific external URL path.
      * If the given URL doesn't begin with a leading slash (`'/'`), this method adds one
-     * before normalizing. This method will also add a hash if `HashLocationStrategy` is
+     * before normalizing. This method also adds a hash if `HashLocationStrategy` is
      * used, or the `APP_BASE_HREF` if the `PathLocationStrategy` is in use.
+     *
+     *
+     * @param url String representing a URL.
+     *
+     * @returns  A normalized platform-specific URL.
      */
     Location.prototype.prepareExternalUrl = function (url) {
         if (url && url[0] !== '/') {
@@ -298,8 +317,13 @@ var Location = /** @class */ (function () {
     };
     // TODO: rename this method to pushState
     /**
-     * Changes the browsers URL to the normalized version of the given URL, and pushes a
+     * Changes the browsers URL to a normalized version of the given URL, and pushes a
      * new item onto the platform's history.
+     *
+     * @param path  URL path to normalizze
+     * @param query Query parameters
+     * @param state Location history state
+     *
      */
     Location.prototype.go = function (path, query, state) {
         if (query === void 0) { query = ''; }
@@ -307,8 +331,12 @@ var Location = /** @class */ (function () {
         this._platformStrategy.pushState(state, '', path, query);
     };
     /**
-     * Changes the browsers URL to the normalized version of the given URL, and replaces
+     * Changes the browser's URL to a normalized version of the given URL, and replaces
      * the top item on the platform's history stack.
+     *
+     * @param path  URL path to normalizze
+     * @param query Query parameters
+     * @param state Location history state
      */
     Location.prototype.replaceState = function (path, query, state) {
         if (query === void 0) { query = ''; }
@@ -325,19 +353,34 @@ var Location = /** @class */ (function () {
     Location.prototype.back = function () { this._platformStrategy.back(); };
     /**
      * Subscribe to the platform's `popState` events.
+     *
+     * @param value Event that is triggered when the state history changes.
+     * @param exception The exception to throw.
+     *
+     * @returns Subscribed events.
      */
     Location.prototype.subscribe = function (onNext, onThrow, onReturn) {
         return this._subject.subscribe({ next: onNext, error: onThrow, complete: onReturn });
     };
     /**
-     * Given a string of url parameters, prepend with '?' if needed, otherwise return parameters as
-     * is.
+     * Given a string of url parameters, prepend with `?` if needed, otherwise return the
+     * parameters as is.
+     *
+     *  @param  params String of URL parameters
+     *
+     *  @returns URL parameters prepended with `?` or the parameters as is.
      */
     Location.normalizeQueryParams = function (params) {
         return params && params[0] !== '?' ? '?' + params : params;
     };
     /**
-     * Given 2 parts of a url, join them with a slash if needed.
+     * Given 2 parts of a URL, join them with a slash if needed.
+     *
+     * @param start  URL string
+     * @param end    URL string
+     *
+     *
+     * @returns Given URL strings joined with a slash, if needed.
      */
     Location.joinWithSlash = function (start, end) {
         if (start.length == 0) {
@@ -362,9 +405,14 @@ var Location = /** @class */ (function () {
         return start + '/' + end;
     };
     /**
-     * If url has a trailing slash, remove it, otherwise return url as is. This
-     * method looks for the first occurrence of either #, ?, or the end of the
-     * line as `/` characters after any of these should not be replaced.
+     * If URL has a trailing slash, remove it, otherwise return the URL as is. The
+     * method looks for the first occurrence of either `#`, `?`, or the end of the
+     * line as `/` characters and removes the trailing slash if one exists.
+     *
+     * @param url URL string
+     *
+     * @returns Returns a URL string after removing the trailing slash if one exists, otherwise
+     * returns the string as is.
      */
     Location.stripTrailingSlash = function (url) {
         var match = url.match(/#|\?|$/);
@@ -777,8 +825,9 @@ var CURRENCIES_EN = {
  * found in the LICENSE file at https://angular.io/license
  */
 /**
- * The different format styles that can be used to represent numbers.
- * Used by the function {@link getLocaleNumberFormat}.
+ * Format styles that can be used to represent numbers.
+ * @see `getLocaleNumberFormat()`.
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -789,7 +838,14 @@ var NumberFormatStyle;
     NumberFormatStyle[NumberFormatStyle["Currency"] = 2] = "Currency";
     NumberFormatStyle[NumberFormatStyle["Scientific"] = 3] = "Scientific";
 })(NumberFormatStyle || (NumberFormatStyle = {}));
-/** @publicApi */
+/**
+ * Plurality cases used for translating plurals to different languages.
+ *
+ * @see `NgPlural`
+ * @see `NgPluralCase`
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
+ *
+ * @publicApi */
 var Plural;
 (function (Plural) {
     Plural[Plural["Zero"] = 0] = "Zero";
@@ -800,11 +856,11 @@ var Plural;
     Plural[Plural["Other"] = 5] = "Other";
 })(Plural || (Plural = {}));
 /**
- * Some languages use two different forms of strings (standalone and format) depending on the
- * context.
- * Typically the standalone version is the nominative form of the word, and the format version is in
- * the genitive.
- * See [the CLDR website](http://cldr.unicode.org/translation/date-time) for more information.
+ * Context-dependant translation forms for strings.
+ * Typically the standalone version is for the nominative form of the word,
+ * and the format version is used for the genitive case.
+ * @see [CLDR website](http://cldr.unicode.org/translation/date-time#TOC-Stand-Alone-vs.-Format-Styles)
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -814,85 +870,143 @@ var FormStyle;
     FormStyle[FormStyle["Standalone"] = 1] = "Standalone";
 })(FormStyle || (FormStyle = {}));
 /**
- * Multiple widths are available for translations: narrow (1 character), abbreviated (3 characters),
- * wide (full length), and short (2 characters, only for days).
- *
- * For example the day `Sunday` will be:
- * - Narrow: `S`
- * - Short: `Su`
- * - Abbreviated: `Sun`
- * - Wide: `Sunday`
+ * String widths available for translations.
+ * The specific character widths are locale-specific.
+ * Examples are given for the word "Sunday" in English.
  *
  * @publicApi
  */
 var TranslationWidth;
 (function (TranslationWidth) {
+    /** 1 character for `en-US`. For example: 'S' */
     TranslationWidth[TranslationWidth["Narrow"] = 0] = "Narrow";
+    /** 3 characters for `en-US`. For example: 'Sun' */
     TranslationWidth[TranslationWidth["Abbreviated"] = 1] = "Abbreviated";
+    /** Full length for `en-US`. For example: "Sunday" */
     TranslationWidth[TranslationWidth["Wide"] = 2] = "Wide";
+    /** 2 characters for `en-US`, For example: "Su" */
     TranslationWidth[TranslationWidth["Short"] = 3] = "Short";
 })(TranslationWidth || (TranslationWidth = {}));
 /**
- * Multiple widths are available for formats: short (minimal amount of data), medium (small amount
- * of data), long (complete amount of data), full (complete amount of data and extra information).
+ * String widths available for date-time formats.
+ * The specific character widths are locale-specific.
+ * Examples are given for `en-US`.
  *
- * For example the date-time formats for the english locale will be:
- *  - `'short'`: `'M/d/yy, h:mm a'` (e.g. `6/15/15, 9:03 AM`)
- *  - `'medium'`: `'MMM d, y, h:mm:ss a'` (e.g. `Jun 15, 2015, 9:03:01 AM`)
- *  - `'long'`: `'MMMM d, y, h:mm:ss a z'` (e.g. `June 15, 2015 at 9:03:01 AM GMT+1`)
- *  - `'full'`: `'EEEE, MMMM d, y, h:mm:ss a zzzz'` (e.g. `Monday, June 15, 2015 at
- * 9:03:01 AM GMT+01:00`)
- *
+ * @see `getLocaleDateFormat()`
+ * @see `getLocaleTimeFormat()``
+ * @see `getLocaleDateTimeFormat()`
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  * @publicApi
  */
 var FormatWidth;
 (function (FormatWidth) {
+    /**
+     * For `en-US`, 'M/d/yy, h:mm a'`
+     * (Example: `6/15/15, 9:03 AM`)
+     */
     FormatWidth[FormatWidth["Short"] = 0] = "Short";
+    /**
+     * For `en-US`, `'MMM d, y, h:mm:ss a'`
+     * (Example: `Jun 15, 2015, 9:03:01 AM`)
+     */
     FormatWidth[FormatWidth["Medium"] = 1] = "Medium";
+    /**
+     * For `en-US`, `'MMMM d, y, h:mm:ss a z'`
+     * (Example: `June 15, 2015 at 9:03:01 AM GMT+1`)
+     */
     FormatWidth[FormatWidth["Long"] = 2] = "Long";
+    /**
+     * For `en-US`, `'EEEE, MMMM d, y, h:mm:ss a zzzz'`
+     * (Example: `Monday, June 15, 2015 at 9:03:01 AM GMT+01:00`)
+     */
     FormatWidth[FormatWidth["Full"] = 3] = "Full";
 })(FormatWidth || (FormatWidth = {}));
 /**
- * Number symbol that can be used to replace placeholders in number patterns.
- * The placeholders are based on english values:
+ * Symbols that can be used to replace placeholders in number patterns.
+ * Examples are based on `en-US` values.
  *
- * | Name                   | Example for en-US | Meaning                                     |
- * |------------------------|-------------------|---------------------------------------------|
- * | decimal                | 2,345`.`67        | decimal separator                           |
- * | group                  | 2`,`345.67        | grouping separator, typically for thousands |
- * | plusSign               | `+`23             | the plus sign used with numbers             |
- * | minusSign              | `-`23             | the minus sign used with numbers            |
- * | percentSign            | 23.4`%`           | the percent sign (out of 100)               |
- * | perMille               | 234`‰`            | the permille sign (out of 1000)             |
- * | exponential            | 1.2`E`3           | used in computers for 1.2×10³.              |
- * | superscriptingExponent | 1.2`×`103         | human-readable format of exponential        |
- * | infinity               | `∞`               | used in +∞ and -∞.                          |
- * | nan                    | `NaN`             | "not a number".                             |
- * | timeSeparator          | 10`:`52           | symbol used between time units              |
- * | currencyDecimal        | $2,345`.`67       | decimal separator, fallback to "decimal"    |
- * | currencyGroup          | $2`,`345.67       | grouping separator, fallback to "group"     |
+ * @see `getLocaleNumberSymbol()`
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
 var NumberSymbol;
 (function (NumberSymbol) {
+    /**
+     * Decimal separator.
+     * For `en-US`, the dot character.
+     * Example : 2,345`.`67
+     */
     NumberSymbol[NumberSymbol["Decimal"] = 0] = "Decimal";
+    /**
+     * Grouping separator, typically for thousands.
+     * For `en-US`, the comma character.
+     * Example: 2`,`345.67
+     */
     NumberSymbol[NumberSymbol["Group"] = 1] = "Group";
+    /**
+     * List-item separator.
+     * Example: "one, two, and three"
+     */
     NumberSymbol[NumberSymbol["List"] = 2] = "List";
+    /**
+     * Sign for percentage (out of 100).
+     * Example: 23.4%
+     */
     NumberSymbol[NumberSymbol["PercentSign"] = 3] = "PercentSign";
+    /**
+     * Sign for positive numbers.
+     * Example: +23
+     */
     NumberSymbol[NumberSymbol["PlusSign"] = 4] = "PlusSign";
+    /**
+     * Sign for negative numbers.
+     * Example: -23
+     */
     NumberSymbol[NumberSymbol["MinusSign"] = 5] = "MinusSign";
+    /**
+     * Computer notation for exponential value (n times a power of 10).
+     * Example: 1.2E3
+     */
     NumberSymbol[NumberSymbol["Exponential"] = 6] = "Exponential";
+    /**
+     * Human-readable format of exponential.
+     * Example: 1.2x103
+     */
     NumberSymbol[NumberSymbol["SuperscriptingExponent"] = 7] = "SuperscriptingExponent";
+    /**
+     * Sign for permille (out of 1000).
+     * Example: 23.4‰
+     */
     NumberSymbol[NumberSymbol["PerMille"] = 8] = "PerMille";
+    /**
+     * Infinity, can be used with plus and minus.
+     * Example: ∞, +∞, -∞
+     */
     NumberSymbol[NumberSymbol["Infinity"] = 9] = "Infinity";
+    /**
+     * Not a number.
+     * Example: NaN
+     */
     NumberSymbol[NumberSymbol["NaN"] = 10] = "NaN";
+    /**
+     * Symbol used between time units.
+     * Example: 10:52
+     */
     NumberSymbol[NumberSymbol["TimeSeparator"] = 11] = "TimeSeparator";
+    /**
+     * Decimal separator for currency values (fallback to `Decimal`).
+     * Example: $2,345.67
+     */
     NumberSymbol[NumberSymbol["CurrencyDecimal"] = 12] = "CurrencyDecimal";
+    /**
+     * Group separator for currency values (fallback to `Group`).
+     * Example: $2,345.67
+     */
     NumberSymbol[NumberSymbol["CurrencyGroup"] = 13] = "CurrencyGroup";
 })(NumberSymbol || (NumberSymbol = {}));
 /**
- * The value for each day of the week, based on the en-US locale
+ * The value for each day of the week, based on the `en-US` locale
  *
  * @publicApi
  */
@@ -907,7 +1021,11 @@ var WeekDay;
     WeekDay[WeekDay["Saturday"] = 6] = "Saturday";
 })(WeekDay || (WeekDay = {}));
 /**
- * The locale id for the chosen locale (e.g `en-GB`).
+ * Retrieves the locale ID from the currently loaded locale.
+ * The loaded locale could be, for example, a global one rather than a regional one.
+ * @param locale A locale code, such as `fr-FR`.
+ * @returns The locale code. For example, `fr`.
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -915,7 +1033,13 @@ function getLocaleId(locale) {
     return findLocaleData(locale)[0 /* LocaleId */];
 }
 /**
- * Periods of the day (e.g. `[AM, PM]` for en-US).
+ * Retrieves day period strings for the given locale.
+ *
+ * @param locale A locale code for the locale format rules to use.
+ * @param formStyle The required grammatical form.
+ * @param width The required character width.
+ * @returns An array of localized period strings. For example, `[AM, PM]` for `en-US`.
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -926,7 +1050,14 @@ function getLocaleDayPeriods(locale, formStyle, width) {
     return getLastDefinedValue(amPm, width);
 }
 /**
- * Days of the week for the Gregorian calendar (e.g. `[Sunday, Monday, ... Saturday]` for en-US).
+ * Retrieves days of the week for the given locale, using the Gregorian calendar.
+ *
+ * @param locale A locale code for the locale format rules to use.
+ * @param formStyle The required grammatical form.
+ * @param width The required character width.
+ * @returns An array of localized name strings.
+ * For example,`[Sunday, Monday, ... Saturday]` for `en-US`.
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -937,7 +1068,14 @@ function getLocaleDayNames(locale, formStyle, width) {
     return getLastDefinedValue(days, width);
 }
 /**
- * Months of the year for the Gregorian calendar (e.g. `[January, February, ...]` for en-US).
+ * Retrieves months of the year for the given locale, using the Gregorian calendar.
+ *
+ * @param locale A locale code for the locale format rules to use.
+ * @param formStyle The required grammatical form.
+ * @param width The required character width.
+ * @returns An array of localized name strings.
+ * For example,  `[January, February, ...]` for `en-US`.
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -948,7 +1086,14 @@ function getLocaleMonthNames(locale, formStyle, width) {
     return getLastDefinedValue(months, width);
 }
 /**
- * Eras for the Gregorian calendar (e.g. AD/BC).
+ * Retrieves Gregorian-calendar eras for the given locale.
+ * @param locale A locale code for the locale format rules to use.
+ * @param formStyle The required grammatical form.
+ * @param width The required character width.
+
+ * @returns An array of localized era strings.
+ * For example, `[AD, BC]` for `en-US`.
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -958,8 +1103,13 @@ function getLocaleEraNames(locale, width) {
     return getLastDefinedValue(erasData, width);
 }
 /**
- * First day of the week for this locale, based on english days (Sunday = 0, Monday = 1, ...).
- * For example in french the value would be 1 because the first day of the week is Monday.
+ * Retrieves the first day of the week for the given locale.
+ *
+ * @param locale A locale code for the locale format rules to use.
+ * @returns A day index number, using the 0-based week-day index for `en-US`
+ * (Sunday = 0, Monday = 1, ...).
+ * For example, for `fr-FR`, returns 1 to indicate that the first day is Monday.
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -968,9 +1118,11 @@ function getLocaleFirstDayOfWeek(locale) {
     return data[8 /* FirstDayOfWeek */];
 }
 /**
- * Range of days in the week that represent the week-end for this locale, based on english days
- * (Sunday = 0, Monday = 1, ...).
- * For example in english the value would be [6,0] for Saturday to Sunday.
+ * Range of week days that are considered the week-end for the given locale.
+ *
+ * @param locale A locale code for the locale format rules to use.
+ * @returns The range of day values, `[startDay, endDay]`.
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -979,27 +1131,13 @@ function getLocaleWeekEndRange(locale) {
     return data[9 /* WeekendRange */];
 }
 /**
- * Date format that depends on the locale.
+ * Retrieves a localized date-value formating string.
  *
- * There are four basic date formats:
- * - `full` should contain long-weekday (EEEE), year (y), long-month (MMMM), day (d).
- *
- *  For example, English uses `EEEE, MMMM d, y`, corresponding to a date like
- *  "Tuesday, September 14, 1999".
- *
- * - `long` should contain year, long-month, day.
- *
- *  For example, `MMMM d, y`, corresponding to a date like "September 14, 1999".
- *
- * - `medium` should contain year, abbreviated-month (MMM), day.
- *
- *  For example, `MMM d, y`, corresponding to a date like "Sep 14, 1999".
- *  For languages that do not use abbreviated months, use the numeric month (MM/M). For example,
- *  `y/MM/dd`, corresponding to a date like "1999/09/14".
- *
- * - `short` should contain year, numeric-month (MM/M), and day.
- *
- *  For example, `M/d/yy`, corresponding to a date like "9/14/99".
+ * @param locale A locale code for the locale format rules to use.
+ * @param width The format type.
+ * @returns The localized formating string.
+ * @see `FormatWidth`
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -1008,23 +1146,14 @@ function getLocaleDateFormat(locale, width) {
     return getLastDefinedValue(data[10 /* DateFormat */], width);
 }
 /**
- * Time format that depends on the locale.
+ * Retrieves a localized time-value formatting string.
  *
- * The standard formats include four basic time formats:
- * - `full` should contain hour (h/H), minute (mm), second (ss), and zone (zzzz).
- * - `long` should contain hour, minute, second, and zone (z)
- * - `medium` should contain hour, minute, second.
- * - `short` should contain hour, minute.
- *
- * Note: The patterns depend on whether the main country using your language uses 12-hour time or
- * not:
- * - For 12-hour time, use a pattern like `hh:mm a` using h to mean a 12-hour clock cycle running
- * 1 through 12 (midnight plus 1 minute is 12:01), or using K to mean a 12-hour clock cycle
- * running 0 through 11 (midnight plus 1 minute is 0:01).
- * - For 24-hour time, use a pattern like `HH:mm` using H to mean a 24-hour clock cycle running 0
- * through 23 (midnight plus 1 minute is 0:01), or using k to mean a 24-hour clock cycle running
- * 1 through 24 (midnight plus 1 minute is 24:01).
- *
+ * @param locale A locale code for the locale format rules to use.
+ * @param width The format type.
+ * @returns The localized formatting string.
+ * @see `FormatWidth`
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
+
  * @publicApi
  */
 function getLocaleTimeFormat(locale, width) {
@@ -1032,27 +1161,13 @@ function getLocaleTimeFormat(locale, width) {
     return getLastDefinedValue(data[11 /* TimeFormat */], width);
 }
 /**
- * Date-time format that depends on the locale.
+ * Retrieves a localized date-time formatting string.
  *
- * The date-time pattern shows how to combine separate patterns for date (represented by {1})
- * and time (represented by {0}) into a single pattern. It usually doesn't need to be changed.
- * What you want to pay attention to are:
- * - possibly removing a space for languages that don't use it, such as many East Asian languages
- * - possibly adding a comma, other punctuation, or a combining word
- *
- * For example:
- * - English uses `{1} 'at' {0}` or `{1}, {0}` (depending on date style), while Japanese uses
- *  `{1}{0}`.
- * - An English formatted date-time using the combining pattern `{1}, {0}` could be
- *  `Dec 10, 2010, 3:59:49 PM`. Notice the comma and space between the date portion and the time
- *  portion.
- *
- * There are four formats (`full`, `long`, `medium`, `short`); the determination of which to use
- * is normally based on the date style. For example, if the date has a full month and weekday
- * name, the full combining pattern will be used to combine that with a time. If the date has
- * numeric month, the short version of the combining pattern will be used to combine that with a
- * time. English uses `{1} 'at' {0}` for full and long styles, and `{1}, {0}` for medium and short
- * styles.
+ * @param locale A locale code for the locale format rules to use.
+ * @param width The format type.
+ * @returns The localized formatting string.
+ * @see `FormatWidth`
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -1062,8 +1177,12 @@ function getLocaleDateTimeFormat(locale, width) {
     return getLastDefinedValue(dateTimeFormatData, width);
 }
 /**
- * Number symbol that can be used to replace placeholders in number formats.
- * See {@link NumberSymbol} for more information.
+ * Retrieves a localized number symbol that can be used to replace placeholders in number formats.
+ * @param locale The locale code.
+ * @param symbol The symbol to localize.
+ * @returns The character for the localized symbol.
+ * @see `NumberSymbol`
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -1081,17 +1200,17 @@ function getLocaleNumberSymbol(locale, symbol) {
     return res;
 }
 /**
- * Number format that depends on the locale.
+ * Retrieves a number format for a given locale.
  *
  * Numbers are formatted using patterns, like `#,###.00`. For example, the pattern `#,###.00`
- * when used to format the number 12345.678 could result in "12'345,67". That would happen if the
+ * when used to format the number 12345.678 could result in "12'345,678". That would happen if the
  * grouping separator for your language is an apostrophe, and the decimal separator is a comma.
  *
- * <b>Important:</b> The characters `.` `,` `0` `#` (and others below) are special placeholders;
- * they stand for the decimal separator, and so on, and are NOT real characters.
- * You must NOT "translate" the placeholders; for example, don't change `.` to `,` even though in
+ * <b>Important:</b> The characters `.` `,` `0` `#` (and others below) are special placeholders
+ * that stand for the decimal separator, and so on, and are NOT real characters.
+ * You must NOT "translate" the placeholders. For example, don't change `.` to `,` even though in
  * your language the decimal point is written with a comma. The symbols should be replaced by the
- * local equivalents, using the Number Symbols for your language.
+ * local equivalents, using the appropriate `NumberSymbol` for your language.
  *
  * Here are the special characters used in number patterns:
  *
@@ -1101,13 +1220,17 @@ function getLocaleNumberSymbol(locale, symbol) {
  * | , | Replaced by the "grouping" (thousands) separator. |
  * | 0 | Replaced by a digit (or zero if there aren't enough digits). |
  * | # | Replaced by a digit (or nothing if there aren't enough). |
- * | ¤ | This will be replaced by a currency symbol, such as $ or USD. |
- * | % | This marks a percent format. The % symbol may change position, but must be retained. |
- * | E | This marks a scientific format. The E symbol may change position, but must be retained. |
+ * | ¤ | Replaced by a currency symbol, such as $ or USD. |
+ * | % | Marks a percent format. The % symbol may change position, but must be retained. |
+ * | E | Marks a scientific format. The E symbol may change position, but must be retained. |
  * | ' | Special characters used as literal characters are quoted with ASCII single quotes. |
  *
- * You can find more information
- * [on the CLDR website](http://cldr.unicode.org/translation/number-patterns)
+ * @param locale A locale code for the locale format rules to use.
+ * @param type The type of numeric value to be formatted (such as `Decimal` or `Currency`.)
+ * @returns The localized format string.
+ * @see `NumberFormatStyle`
+ * @see [CLDR website](http://cldr.unicode.org/translation/number-patterns)
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -1116,9 +1239,13 @@ function getLocaleNumberFormat(locale, type) {
     return data[14 /* NumberFormats */][type];
 }
 /**
- * The symbol used to represent the currency for the main country using this locale (e.g. $ for
- * the locale en-US).
- * The symbol will be `null` if the main country cannot be determined.
+ * Retrieves the symbol used to represent the currency for the main country
+ * corresponding to a given locale. For example, '$' for `en-US`.
+ *
+ * @param locale A locale code for the locale format rules to use.
+ * @returns The localized symbol character,
+ * or `null` if the main country cannot be determined.
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -1127,9 +1254,12 @@ function getLocaleCurrencySymbol(locale) {
     return data[15 /* CurrencySymbol */] || null;
 }
 /**
- * The name of the currency for the main country using this locale (e.g. 'US Dollar' for the locale
- * en-US).
- * The name will be `null` if the main country cannot be determined.
+ * Retrieves the name of the currency for the main country corresponding
+ * to a given locale. For example, 'US Dollar' for `en-US`.
+ * @param locale A locale code for the locale format rules to use.
+ * @returns The currency name,
+ * or `null` if the main country cannot be determined.
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -1138,15 +1268,22 @@ function getLocaleCurrencyName(locale) {
     return data[16 /* CurrencyName */] || null;
 }
 /**
- * Returns the currency values for the locale
+ * Retrieves the currency values for a given locale.
+ * @param locale A locale code for the locale format rules to use.
+ * @returns The currency values.
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  */
 function getLocaleCurrencies(locale) {
     var data = findLocaleData(locale);
     return data[17 /* Currencies */];
 }
 /**
- * The locale plural function used by ICU expressions to determine the plural case to use.
- * See {@link NgPlural} for more information.
+ * Retrieves the plural function used by ICU expressions to determine the plural case to use
+ * for a given locale.
+ * @param locale A locale code for the locale format rules to use.
+ * @returns The plural function for the locale.
+ * @see `NgPlural`
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -1160,17 +1297,24 @@ function checkFullData(data) {
     }
 }
 /**
- * Rules used to determine which day period to use (See `dayPeriods` below).
- * The rules can either be an array or a single value. If it's an array, consider it as "from"
- * and "to". If it's a single value then it means that the period is only valid at this exact
- * value.
- * There is always the same number of rules as the number of day periods, which means that the
- * first rule is applied to the first day period and so on.
- * You should fallback to AM/PM when there are no rules available.
+ * Retrieves locale-specific rules used to determine which day period to use
+ * when more than one period is defined for a locale.
  *
- * Note: this is only available if you load the full locale data.
- * See the ["I18n guide"](guide/i18n#i18n-pipes) to know how to import additional locale
- * data.
+ * There is a rule for each defined day period. The
+ * first rule is applied to the first day period and so on.
+ * Fall back to AM/PM when no rules are available.
+ *
+ * A rule can specify a period as time range, or as a single time value.
+ *
+ * This functionality is only available when you have loaded the full locale data.
+ * See the ["I18n guide"](guide/i18n#i18n-pipes).
+ *
+ * @param locale A locale code for the locale format rules to use.
+ * @returns The rules for the locale, a single time value or array of *from-time, to-time*,
+ * or null if no periods are available.
+ *
+ * @see `getLocaleExtraDayPeriods()`
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -1186,15 +1330,19 @@ function getLocaleExtraDayPeriodRules(locale) {
     });
 }
 /**
- * Day Periods indicate roughly how the day is broken up in different languages (e.g. morning,
- * noon, afternoon, midnight, ...).
- * You should use the function {@link getLocaleExtraDayPeriodRules} to determine which period to
- * use.
- * You should fallback to AM/PM when there are no day periods available.
+ * Retrieves locale-specific day periods, which indicate roughly how a day is broken up
+ * in different languages.
+ * For example, for `en-US`, periods are morning, noon, afternoon, evening, and midnight.
  *
- * Note: this is only available if you load the full locale data.
- * See the ["I18n guide"](guide/i18n#i18n-pipes) to know how to import additional locale
- * data.
+ * This functionality is only available when you have loaded the full locale data.
+ * See the ["I18n guide"](guide/i18n#i18n-pipes).
+ *
+ * @param locale A locale code for the locale format rules to use.
+ * @param formStyle The required grammatical form.
+ * @param width The required character width.
+ * @returns The translated day-period strings.
+ * @see `getLocaleExtraDayPeriodRules()`
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -1209,11 +1357,15 @@ function getLocaleExtraDayPeriods(locale, formStyle, width) {
     return getLastDefinedValue(dayPeriods, width) || [];
 }
 /**
- * Returns the first value that is defined in an array, going backwards.
+ * Retrieves the first value that is defined in an array, going backwards from an index position.
  *
- * To avoid repeating the same data (e.g. when "format" and "standalone" are the same) we only
- * add the first one to the locale data arrays, the other ones are only defined when different.
- * We use this function to retrieve the first defined value.
+ * To avoid repeating the same data (as when the "format" and "standalone" forms are the same)
+ * add the first value to the locale data arrays, and add other values only if they are different.
+ *
+ * @param data The data array to retrieve from.
+ * @param index A 0-based index into the array to start from.
+ * @returns The value immediately before the given index position.
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -1226,14 +1378,18 @@ function getLastDefinedValue(data, index) {
     throw new Error('Locale data API: locale data undefined');
 }
 /**
- * Extract the hours and minutes from a string like "15:45"
+ * Extracts the hours and minutes from a string like "15:45"
  */
 function extractTime(time) {
     var _a = Object(tslib__WEBPACK_IMPORTED_MODULE_1__["__read"])(time.split(':'), 2), h = _a[0], m = _a[1];
     return { hours: +h, minutes: +m };
 }
 /**
- * Finds the locale data for a locale id
+ * Finds the locale data for a given locale.
+ *
+ * @param locale The locale code.
+ * @returns The locale data.
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -1255,9 +1411,17 @@ function findLocaleData(locale) {
     throw new Error("Missing locale data for the locale \"" + locale + "\".");
 }
 /**
- * Returns the currency symbol for a given currency code, or the code if no symbol available
- * (e.g.: format narrow = $, format wide = US$, code = USD)
- * If no locale is provided, it uses the locale "en" by default
+ * Retrieves the currency symbol for a given currency code.
+ *
+ * For example, for the default `en-US` locale, the code `USD` can
+ * be represented by the narrow symbol `$` or the wide symbol `US$`.
+ *
+ * @param code The currency code.
+ * @param format The format, `wide` or `narrow`.
+ * @param locale A locale code for the locale format rules to use.
+ *
+ * @returns The symbol, or the currency code if no symbol is available.0
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -1273,8 +1437,12 @@ function getCurrencySymbol(code, format, locale) {
 // Most currencies have cents, that's why the default is 2
 var DEFAULT_NB_OF_CURRENCY_DIGITS = 2;
 /**
- * Returns the number of decimal digits for the given currency.
- * Its value depends upon the presence of cents in that particular currency.
+ * Reports the number of decimal digits for a given currency.
+ * The value depends upon the presence of cents in that particular currency.
+ *
+ * @param code The currency code.
+ * @returns The number of decimal digits, typically 0 or 2.
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -1329,17 +1497,18 @@ var TranslationType;
  *
  * Formats a date according to locale rules.
  *
- * Where:
- * - `value` is a Date, a number (milliseconds since UTC epoch) or an ISO string
- *   (https://www.w3.org/TR/NOTE-datetime).
- * - `format` indicates which date/time components to include. See {@link DatePipe} for more
- *   details.
- * - `locale` is a `string` defining the locale to use.
- * - `timezone` to be used for formatting. It understands UTC/GMT and the continental US time zone
- *   abbreviations, but for general use, use a time zone offset (e.g. `'+0430'`).
- *   If not specified, host system settings are used.
+ * @param value The date to format, as a Date, or a number (milliseconds since UTC epoch)
+ * or an [ISO date-time string](https://www.w3.org/TR/NOTE-datetime).
+ * @param format The date-time components to include. See `DatePipe` for details.
+ * @param locale A locale code for the locale format rules to use.
+ * @param timezone The time zone. A time zone offset from GMT (such as `'+0430'`),
+ * or a standard UTC/GMT or continental US time zone abbreviation.
+ * If not specified, uses host system settings.
  *
- * See {@link DatePipe} for more details.
+ * @returns The formatted date string.
+ *
+ * @see `DatePipe`
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -1961,7 +2130,7 @@ var DIGIT_CHAR = '#';
 var CURRENCY_CHAR = '¤';
 var PERCENT_CHAR = '%';
 /**
- * Transforms a number to a locale string based on a style and a format
+ * Transforms a number to a locale string based on a style and a format.
  */
 function formatNumberToLocaleString(value, pattern, locale, groupSymbol, decimalSymbol, digitsInfo, isPercent) {
     if (isPercent === void 0) { isPercent = false; }
@@ -2055,15 +2224,21 @@ function formatNumberToLocaleString(value, pattern, locale, groupSymbol, decimal
  *
  * Formats a number as currency using locale rules.
  *
- * Use `currency` to format a number as currency.
+ * @param value The number to format.
+ * @param locale A locale code for the locale format rules to use.
+ * @param currency A string containing the currency symbol or its name,
+ * such as "$" or "Canadian Dollar". Used in output string, but does not affect the operation
+ * of the function.
+ * @param currencyCode The [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217)
+ * currency code to use in the result string, such as `USD` for the US dollar and `EUR` for the euro.
+ * @param digitInfo Decimal representation options, specified by a string in the following format:
+ * `{minIntegerDigits}.{minFractionDigits}-{maxFractionDigits}`. See `DecimalPipe` for more details.
  *
- * Where:
- * - `value` is a number.
- * - `locale` is a `string` defining the locale to use.
- * - `currency` is the string that represents the currency, it can be its symbol or its name.
- * - `currencyCode` is the [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217) currency code, such
- *    as `USD` for the US dollar and `EUR` for the euro.
- * - `digitInfo` See {@link DecimalPipe} for more details.
+ * @returns The formatted currency value.
+ *
+ * @see `formatNumber()`
+ * @see `DecimalPipe`
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -2084,12 +2259,18 @@ function formatCurrency(value, locale, currency, currencyCode, digitsInfo) {
  *
  * Formats a number as a percentage according to locale rules.
  *
- * Where:
- * - `value` is a number.
- * - `locale` is a `string` defining the locale to use.
- * - `digitInfo` See {@link DecimalPipe} for more details.
+ * @param value The number to format.
+ * @param locale A locale code for the locale format rules to use.
+ * @param digitInfo Decimal representation options, specified by a string in the following format:
+ * `{minIntegerDigits}.{minFractionDigits}-{maxFractionDigits}`. See `DecimalPipe` for more details.
  *
+ * @returns The formatted percentage value.
+ *
+ * @see `formatNumber()`
+ * @see `DecimalPipe`
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  * @publicApi
+ *
  */
 function formatPercent(value, locale, digitsInfo) {
     var format = getLocaleNumberFormat(locale, NumberFormatStyle.Percent);
@@ -2101,13 +2282,16 @@ function formatPercent(value, locale, digitsInfo) {
  * @ngModule CommonModule
  * @description
  *
- * Formats a number as text. Group sizing and separator and other locale-specific
- * configurations are based on the locale.
+ * Formats a number as text, with group sizing, separator, and other
+ * parameters based on the locale.
  *
- * Where:
- * - `value` is a number.
- * - `locale` is a `string` defining the locale to use.
- * - `digitInfo` See {@link DecimalPipe} for more details.
+ * @param value The number to format.
+ * @param locale A locale code for the locale format rules to use.
+ * @param digitInfo Decimal representation options, specified by a string in the following format:
+ * `{minIntegerDigits}.{minFractionDigits}-{maxFractionDigits}`. See `DecimalPipe` for more details.
+ *
+ * @returns The formatted text string.
+ * @see [Internationalization (i18n) Guide](https://angular.io/guide/i18n)
  *
  * @publicApi
  */
@@ -5891,7 +6075,7 @@ function isPlatformWorkerUi(platformId) {
 /**
  * @publicApi
  */
-var VERSION = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["Version"]('7.2.6');
+var VERSION = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["Version"]('7.2.14');
 
 /**
  * @license
@@ -5911,16 +6095,20 @@ var ViewportScroller = /** @class */ (function () {
     // De-sugared tree-shakable injection
     // See #23917
     /** @nocollapse */
-    ViewportScroller.ngInjectableDef = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["defineInjectable"])({ providedIn: 'root', factory: function () { return new BrowserViewportScroller(Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["inject"])(DOCUMENT), window); } });
+    ViewportScroller.ngInjectableDef = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["defineInjectable"])({
+        providedIn: 'root',
+        factory: function () { return new BrowserViewportScroller(Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["inject"])(DOCUMENT), window, Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["inject"])(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ErrorHandler"])); }
+    });
     return ViewportScroller;
 }());
 /**
  * Manages the scroll position for a browser window.
  */
 var BrowserViewportScroller = /** @class */ (function () {
-    function BrowserViewportScroller(document, window) {
+    function BrowserViewportScroller(document, window, errorHandler) {
         this.document = document;
         this.window = window;
+        this.errorHandler = errorHandler;
         this.offset = function () { return [0, 0]; };
     }
     /**
@@ -5964,15 +6152,28 @@ var BrowserViewportScroller = /** @class */ (function () {
      */
     BrowserViewportScroller.prototype.scrollToAnchor = function (anchor) {
         if (this.supportScrollRestoration()) {
-            var elSelectedById = this.document.querySelector("#" + anchor);
-            if (elSelectedById) {
-                this.scrollToElement(elSelectedById);
-                return;
+            // Escape anything passed to `querySelector` as it can throw errors and stop the application
+            // from working if invalid values are passed.
+            if (this.window.CSS && this.window.CSS.escape) {
+                anchor = this.window.CSS.escape(anchor);
             }
-            var elSelectedByName = this.document.querySelector("[name='" + anchor + "']");
-            if (elSelectedByName) {
-                this.scrollToElement(elSelectedByName);
-                return;
+            else {
+                anchor = anchor.replace(/(\"|\'\ |:|\.|\[|\]|,|=)/g, '\\$1');
+            }
+            try {
+                var elSelectedById = this.document.querySelector("#" + anchor);
+                if (elSelectedById) {
+                    this.scrollToElement(elSelectedById);
+                    return;
+                }
+                var elSelectedByName = this.document.querySelector("[name='" + anchor + "']");
+                if (elSelectedByName) {
+                    this.scrollToElement(elSelectedByName);
+                    return;
+                }
+            }
+            catch (e) {
+                this.errorHandler.handleError(e);
             }
         }
     };
@@ -6122,7 +6323,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/_esm5/operators/index.js");
 /* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/common */ "./node_modules/@angular/common/fesm5/common.js");
 /**
- * @license Angular v7.2.6
+ * @license Angular v7.2.14
  * (c) 2010-2019 Google LLC. https://angular.io/
  * License: MIT
  */
@@ -6412,8 +6613,10 @@ var HttpHeaders = /** @class */ (function () {
  * found in the LICENSE file at https://angular.io/license
  */
 /**
- * A `HttpParameterCodec` that uses `encodeURIComponent` and `decodeURIComponent` to
- * serialize and parse URL parameter keys and values.
+ * A class that uses `encodeURIComponent` and `decodeURIComponent` to
+ * serialize and parse URL parameter keys and values. If you pass URL query parameters
+ * without encoding, the query parameters can get misinterpreted at the receiving end.
+ * Use the `HttpParameterCodec` class to encode and decode the query-string values.
  *
  * @publicApi
  */
@@ -6586,7 +6789,7 @@ var HttpParams = /** @class */ (function () {
                         }
                 }
             });
-            this.cloneFrom = null;
+            this.cloneFrom = this.updates = null;
         }
     };
     return HttpParams;
@@ -7032,8 +7235,8 @@ var HttpErrorResponse = /** @class */ (function (_super) {
  * found in the LICENSE file at https://angular.io/license
  */
 /**
- * Construct an instance of `HttpRequestOptions<T>` from a source `HttpMethodOptions` and
- * the given `body`. Basically, this clones the object and adds the body.
+ * Constructs an instance of `HttpRequestOptions<T>` from a source `HttpMethodOptions` and
+ * the given `body`. This function clones the object and adds the body.
  */
 function addBody(options, body) {
     return {
@@ -7047,11 +7250,46 @@ function addBody(options, body) {
     };
 }
 /**
- * Perform HTTP requests.
+ * Performs HTTP requests.
  *
  * `HttpClient` is available as an injectable class, with methods to perform HTTP requests.
- * Each request method has multiple signatures, and the return type varies according to which
- * signature is called (mainly the values of `observe` and `responseType`).
+ * Each request method has multiple signatures, and the return type varies based on
+ * the signature that is called (mainly the values of `observe` and `responseType`).
+ *
+ *
+ * @see [HTTP Guide](guide/http)
+ *
+ *
+ * @usageNotes
+ * Sample HTTP requests for the [Tour of Heroes](/tutorial/toh-pt0) application.
+ *
+ * ### HTTP Request Example
+ *
+ * ```
+ *  // GET heroes whose name contains search term
+ * searchHeroes(term: string): observable<Hero[]>{
+ *
+ *  const params = new HttpParams({fromString: 'name=term'});
+ *    return this.httpClient.request('GET', this.heroesUrl, {responseType:'json', params});
+ * }
+ * ```
+ * ### JSONP Example
+ * ```
+ * requestJsonp(url, callback = 'callback') {
+ *  return this.httpClient.jsonp(this.heroesURL, callback);
+ * }
+ * ```
+ *
+ *
+ * ### PATCH Example
+ * ```
+ * // PATCH one of the heroes' name
+ * patchHero (id: number, heroName: string): Observable<{}> {
+ * const url = `${this.heroesUrl}/${id}`;   // PATCH api/heroes/42
+ *  return this.httpClient.patch(url, {name: heroName}, httpOptions)
+ *    .pipe(catchError(this.handleError('patchHero')));
+ * }
+* ```
  *
  * @publicApi
  */
@@ -7060,41 +7298,36 @@ var HttpClient = /** @class */ (function () {
         this.handler = handler;
     }
     /**
-     * Constructs an `Observable` for a particular HTTP request that, when subscribed,
+     * Constructs an observable for a generic HTTP request that, when subscribed,
      * fires the request through the chain of registered interceptors and on to the
      * server.
      *
-     * This method can be called in one of two ways. Either an `HttpRequest`
-     * instance can be passed directly as the only parameter, or a method can be
-     * passed as the first parameter, a string URL as the second, and an
-     * options hash as the third.
+     * You can pass an `HttpRequest` directly as the only parameter. In this case,
+     * the call returns an observable of the raw `HttpEvent` stream.
      *
-     * If a `HttpRequest` object is passed directly, an `Observable` of the
-     * raw `HttpEvent` stream will be returned.
+     * Alternatively you can pass an HTTP method as the first parameter,
+     * a URL string as the second, and an options hash containing the request body as the third.
+     * See `addBody()`. In this case, the specified `responseType` and `observe` options determine the
+     * type of returned observable.
+     *   * The `responseType` value determines how a successful response body is parsed.
+     *   * If `responseType` is the default `json`, you can pass a type interface for the resulting
+     * object as a type parameter to the call.
      *
-     * If a request is instead built by providing a URL, the options object
-     * determines the return type of `request()`. In addition to configuring
-     * request parameters such as the outgoing headers and/or the body, the options
-     * hash specifies two key pieces of information about the request: the
-     * `responseType` and what to `observe`.
+     * The `observe` value determines the return type, according to what you are interested in
+     * observing.
+     *   * An `observe` value of events returns an observable of the raw `HttpEvent` stream, including
+     * progress events by default.
+     *   * An `observe` value of response returns an observable of `HttpResponse<T>`,
+     * where the `T` parameter depends on the `responseType` and any optionally provided type
+     * parameter.
+     *   * An `observe` value of body returns an observable of `<T>` with the same `T` body type.
      *
-     * The `responseType` value determines how a successful response body will be
-     * parsed. If `responseType` is the default `json`, a type interface for the
-     * resulting object may be passed as a type parameter to `request()`.
-     *
-     * The `observe` value determines the return type of `request()`, based on what
-     * the consumer is interested in observing. A value of `events` will return an
-     * `Observable<HttpEvent>` representing the raw `HttpEvent` stream,
-     * including progress events by default. A value of `response` will return an
-     * `Observable<HttpResponse<T>>` where the `T` parameter of `HttpResponse`
-     * depends on the `responseType` and any optionally provided type parameter.
-     * A value of `body` will return an `Observable<T>` with the same `T` body type.
      */
     HttpClient.prototype.request = function (first, url, options) {
         var _this = this;
         if (options === void 0) { options = {}; }
         var req;
-        // Firstly, check whether the primary argument is an instance of `HttpRequest`.
+        // First, check whether the primary argument is an instance of `HttpRequest`.
         if (first instanceof HttpRequest) {
             // It is. The other arguments must be undefined (per the signatures) and can be
             // ignored.
@@ -7102,7 +7335,7 @@ var HttpClient = /** @class */ (function () {
         }
         else {
             // It's a string, so it represents a URL. Construct a request based on it,
-            // and incorporate the remaining arguments (assuming GET unless a method is
+            // and incorporate the remaining arguments (assuming `GET` unless a method is
             // provided.
             // Figure out the headers.
             var headers = undefined;
@@ -7194,39 +7427,55 @@ var HttpClient = /** @class */ (function () {
         }
     };
     /**
-     * Constructs an `Observable` which, when subscribed, will cause the configured
-     * DELETE request to be executed on the server. See the individual overloads for
-     * details of `delete()`'s return type based on the provided options.
+     * Constructs an observable that, when subscribed, causes the configured
+     * `DELETE` request to execute on the server. See the individual overloads for
+     * details on the return type.
+     *
+     * @param url     The endpoint URL.
+     * @param options The HTTP options to send with the request.
+     *
      */
     HttpClient.prototype.delete = function (url, options) {
         if (options === void 0) { options = {}; }
         return this.request('DELETE', url, options);
     };
     /**
-     * Constructs an `Observable` which, when subscribed, will cause the configured
-     * GET request to be executed on the server. See the individual overloads for
-     * details of `get()`'s return type based on the provided options.
+     * Constructs an observable that, when subscribed, causes the configured
+     * `GET` request to execute on the server. See the individual overloads for
+     * details on the return type.
      */
     HttpClient.prototype.get = function (url, options) {
         if (options === void 0) { options = {}; }
         return this.request('GET', url, options);
     };
     /**
-     * Constructs an `Observable` which, when subscribed, will cause the configured
-     * HEAD request to be executed on the server. See the individual overloads for
-     * details of `head()`'s return type based on the provided options.
+     * Constructs an observable that, when subscribed, causes the configured
+     * `HEAD` request to execute on the server. The `HEAD` method returns
+     * meta information about the resource without transferring the
+     * resource itself. See the individual overloads for
+     * details on the return type.
      */
     HttpClient.prototype.head = function (url, options) {
         if (options === void 0) { options = {}; }
         return this.request('HEAD', url, options);
     };
     /**
-     * Constructs an `Observable` which, when subscribed, will cause a request
-     * with the special method `JSONP` to be dispatched via the interceptor pipeline.
+     * Constructs an `Observable` that, when subscribed, causes a request with the special method
+     * `JSONP` to be dispatched via the interceptor pipeline.
+     * The [JSONP pattern](https://en.wikipedia.org/wiki/JSONP) works around limitations of certain
+     * API endpoints that don't support newer,
+     * and preferable [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) protocol.
+     * JSONP treats the endpoint API as a JavaScript file and tricks the browser to process the
+     * requests even if the API endpoint is not located on the same domain (origin) as the client-side
+     * application making the request.
+     * The endpoint API must support JSONP callback for JSONP requests to work.
+     * The resource API returns the JSON response wrapped in a callback function.
+     * You can pass the callback function name as one of the query parameters.
+     * Note that JSONP requests can only be used with `GET` requests.
      *
-     * A suitable interceptor must be installed (e.g. via the `HttpClientJsonpModule`).
-     * If no such interceptor is reached, then the `JSONP` request will likely be
-     * rejected by the configured backend.
+     * @param url The resource URL.
+     * @param callbackParam The callback function name.
+     *
      */
     HttpClient.prototype.jsonp = function (url, callbackParam) {
         return this.request('JSONP', url, {
@@ -7236,36 +7485,40 @@ var HttpClient = /** @class */ (function () {
         });
     };
     /**
-     * Constructs an `Observable` which, when subscribed, will cause the configured
-     * OPTIONS request to be executed on the server. See the individual overloads for
-     * details of `options()`'s return type based on the provided options.
+     * Constructs an `Observable` that, when subscribed, causes the configured
+     * `OPTIONS` request to execute on the server. This method allows the client
+     * to determine the supported HTTP methods and other capabilites of an endpoint,
+     * without implying a resource action. See the individual overloads for
+     * details on the return type.
      */
     HttpClient.prototype.options = function (url, options) {
         if (options === void 0) { options = {}; }
         return this.request('OPTIONS', url, options);
     };
     /**
-     * Constructs an `Observable` which, when subscribed, will cause the configured
-     * PATCH request to be executed on the server. See the individual overloads for
-     * details of `patch()`'s return type based on the provided options.
+     * Constructs an observable that, when subscribed, causes the configured
+     * `PATCH` request to execute on the server. See the individual overloads for
+     * details on the return type.
      */
     HttpClient.prototype.patch = function (url, body, options) {
         if (options === void 0) { options = {}; }
         return this.request('PATCH', url, addBody(options, body));
     };
     /**
-     * Constructs an `Observable` which, when subscribed, will cause the configured
-     * POST request to be executed on the server. See the individual overloads for
-     * details of `post()`'s return type based on the provided options.
+     * Constructs an observable that, when subscribed, causes the configured
+     * `POST` request to execute on the server. The server responds with the location of
+     * the replaced resource. See the individual overloads for
+     * details on the return type.
      */
     HttpClient.prototype.post = function (url, body, options) {
         if (options === void 0) { options = {}; }
         return this.request('POST', url, addBody(options, body));
     };
     /**
-     * Constructs an `Observable` which, when subscribed, will cause the configured
-     * PUT request to be executed on the server. See the individual overloads for
-     * details of `put()`'s return type based on the provided options.
+     * Constructs an observable that, when subscribed, causes the configured
+     * `PUT` request to execute on the server. The `PUT` method replaces an existing resource
+     * with a new set of values.
+     * See the individual overloads for details on the return type.
      */
     HttpClient.prototype.put = function (url, body, options) {
         if (options === void 0) { options = {}; }
@@ -8384,7 +8637,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "R3BoundTarget", function() { return R3BoundTarget; });
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /**
- * @license Angular v7.2.6
+ * @license Angular v7.2.14
  * (c) 2010-2019 Google LLC. https://angular.io/
  * License: MIT
  */
@@ -9245,14 +9498,18 @@ var MissingTranslationStrategy;
     MissingTranslationStrategy[MissingTranslationStrategy["Ignore"] = 2] = "Ignore";
 })(MissingTranslationStrategy || (MissingTranslationStrategy = {}));
 function makeMetadataFactory(name, props) {
-    var factory = function () {
+    // This must be declared as a function, not a fat arrow, so that ES2015 devmode produces code
+    // that works with the static_reflector.ts in the ViewEngine compiler.
+    // In particular, `_registerDecoratorOrConstructor` assumes that the value returned here can be
+    // new'ed.
+    function factory() {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
         var values = props ? props.apply(void 0, Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])(args)) : {};
         return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])({ ngMetadataName: name }, values);
-    };
+    }
     factory.isTypeOf = function (obj) { return obj && obj.ngMetadataName === name; };
     factory.ngMetadataName = name;
     return factory;
@@ -13365,7 +13622,7 @@ function assertArrayOfStrings(identifier, value) {
         }
     }
 }
-var INTERPOLATION_BLACKLIST_REGEXPS = [
+var UNUSABLE_INTERPOLATION_REGEXPS = [
     /^\s*$/,
     /[<>]/,
     /^[{}]$/,
@@ -13379,8 +13636,8 @@ function assertInterpolationSymbols(identifier, value) {
     else if (value != null) {
         var start_1 = value[0];
         var end_1 = value[1];
-        // black list checking
-        INTERPOLATION_BLACKLIST_REGEXPS.forEach(function (regexp) {
+        // Check for unusable interpolation symbols
+        UNUSABLE_INTERPOLATION_REGEXPS.forEach(function (regexp) {
             if (regexp.test(start_1) || regexp.test(end_1)) {
                 throw new Error("['" + start_1 + "', '" + end_1 + "'] contains unusable interpolation symbol.");
             }
@@ -18781,11 +19038,9 @@ var TokenizeResult = /** @class */ (function () {
     }
     return TokenizeResult;
 }());
-function tokenize(source, url, getTagDefinition, tokenizeExpansionForms, interpolationConfig) {
-    if (tokenizeExpansionForms === void 0) { tokenizeExpansionForms = false; }
-    if (interpolationConfig === void 0) { interpolationConfig = DEFAULT_INTERPOLATION_CONFIG; }
-    return new _Tokenizer(new ParseSourceFile(source, url), getTagDefinition, tokenizeExpansionForms, interpolationConfig)
-        .tokenize();
+function tokenize(source, url, getTagDefinition, options) {
+    if (options === void 0) { options = {}; }
+    return new _Tokenizer(new ParseSourceFile(source, url), getTagDefinition, options).tokenize();
 }
 var _CR_OR_CRLF_REGEXP = /\r\n?/g;
 function _unexpectedCharacterErrorMsg(charCode) {
@@ -18809,22 +19064,22 @@ var _Tokenizer = /** @class */ (function () {
      * @param _tokenizeIcu Whether to tokenize ICU messages (considered as text nodes when false)
      * @param _interpolationConfig
      */
-    function _Tokenizer(_file, _getTagDefinition, _tokenizeIcu, _interpolationConfig) {
-        if (_interpolationConfig === void 0) { _interpolationConfig = DEFAULT_INTERPOLATION_CONFIG; }
+    function _Tokenizer(_file, _getTagDefinition, options) {
         this._file = _file;
         this._getTagDefinition = _getTagDefinition;
-        this._tokenizeIcu = _tokenizeIcu;
-        this._interpolationConfig = _interpolationConfig;
-        // Note: this is always lowercase!
         this._peek = -1;
         this._nextPeek = -1;
         this._index = -1;
         this._line = 0;
         this._column = -1;
+        this._currentTokenStart = null;
+        this._currentTokenType = null;
         this._expansionCaseStack = [];
         this._inInterpolation = false;
         this.tokens = [];
         this.errors = [];
+        this._tokenizeIcu = options.tokenizeExpansionForms || false;
+        this._interpolationConfig = options.interpolationConfig || DEFAULT_INTERPOLATION_CONFIG;
         this._input = _file.content;
         this._length = _file.content.length;
         this._advance();
@@ -18916,6 +19171,12 @@ var _Tokenizer = /** @class */ (function () {
     };
     _Tokenizer.prototype._endToken = function (parts, end) {
         if (end === void 0) { end = this._getLocation(); }
+        if (this._currentTokenStart === null) {
+            throw new TokenError('Programming error - attempted to end a token when there was no start to the token', this._currentTokenType, this._getSpan(end, end));
+        }
+        if (this._currentTokenType === null) {
+            throw new TokenError('Programming error - attempted to end a token which has no token type', null, this._getSpan(this._currentTokenStart, end));
+        }
         var token = new Token$1(this._currentTokenType, parts, new ParseSourceSpan(this._currentTokenStart, end));
         this.tokens.push(token);
         this._currentTokenStart = null;
@@ -19409,10 +19670,8 @@ var Parser$1 = /** @class */ (function () {
     function Parser(getTagDefinition) {
         this.getTagDefinition = getTagDefinition;
     }
-    Parser.prototype.parse = function (source, url, parseExpansionForms, interpolationConfig) {
-        if (parseExpansionForms === void 0) { parseExpansionForms = false; }
-        if (interpolationConfig === void 0) { interpolationConfig = DEFAULT_INTERPOLATION_CONFIG; }
-        var tokensAndErrors = tokenize(source, url, this.getTagDefinition, parseExpansionForms, interpolationConfig);
+    Parser.prototype.parse = function (source, url, options) {
+        var tokensAndErrors = tokenize(source, url, this.getTagDefinition, options);
         var treeAndErrors = new _TreeBuilder(tokensAndErrors.tokens, this.getTagDefinition).build();
         return new ParseTreeResult(treeAndErrors.rootNodes, tokensAndErrors.errors.concat(treeAndErrors.errors));
     };
@@ -19746,10 +20005,8 @@ var HtmlParser = /** @class */ (function (_super) {
     function HtmlParser() {
         return _super.call(this, getHtmlTagDefinition) || this;
     }
-    HtmlParser.prototype.parse = function (source, url, parseExpansionForms, interpolationConfig) {
-        if (parseExpansionForms === void 0) { parseExpansionForms = false; }
-        if (interpolationConfig === void 0) { interpolationConfig = DEFAULT_INTERPOLATION_CONFIG; }
-        return _super.prototype.parse.call(this, source, url, parseExpansionForms, interpolationConfig);
+    HtmlParser.prototype.parse = function (source, url, options) {
+        return _super.prototype.parse.call(this, source, url, options);
     };
     return HtmlParser;
 }(Parser$1));
@@ -20217,9 +20474,9 @@ var DomElementSchemaRegistry = /** @class */ (function (_super) {
      * Tag and property name are statically known and cannot change at runtime, i.e. it is not
      * possible to bind a value into a changing attribute or tag name.
      *
-     * The filtering is white list based. All attributes in the schema above are assumed to have the
-     * 'NONE' security context, i.e. that they are safe inert string values. Only specific well known
-     * attack vectors are assigned their appropriate context.
+     * The filtering is based on a list of allowed tags|attributes. All attributes in the schema
+     * above are assumed to have the 'NONE' security context, i.e. that they are safe inert
+     * string values. Only specific well known attack vectors are assigned their appropriate context.
      */
     DomElementSchemaRegistry.prototype.securityContext = function (tagName, propName, isAttribute) {
         if (isAttribute) {
@@ -23164,13 +23421,14 @@ function interpolate(args) {
  *
  * @param template text of the template to parse
  * @param templateUrl URL to use for source mapping of the parsed template
+ * @param options options to modify how the template is parsed
  */
 function parseTemplate(template, templateUrl, options) {
     if (options === void 0) { options = {}; }
     var interpolationConfig = options.interpolationConfig, preserveWhitespaces = options.preserveWhitespaces;
     var bindingParser = makeBindingParser(interpolationConfig);
     var htmlParser = new HtmlParser();
-    var parseResult = htmlParser.parse(template, templateUrl, true, interpolationConfig);
+    var parseResult = htmlParser.parse(template, templateUrl, Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])({}, options, { tokenizeExpansionForms: true }));
     if (parseResult.errors && parseResult.errors.length > 0) {
         return { errors: parseResult.errors, nodes: [] };
     }
@@ -24005,7 +24263,7 @@ var CompilerFacadeImpl = /** @class */ (function () {
             InterpolationConfig.fromArray(facade.interpolation) :
             DEFAULT_INTERPOLATION_CONFIG;
         // Parse the template and check for errors.
-        var template = parseTemplate(facade.template, sourceMapUrl, { preserveWhitespaces: facade.preserveWhitespaces || false, interpolationConfig: interpolationConfig });
+        var template = parseTemplate(facade.template, sourceMapUrl, { preserveWhitespaces: facade.preserveWhitespaces, interpolationConfig: interpolationConfig });
         if (template.errors !== undefined) {
             var errors = template.errors.map(function (err) { return err.toString(); }).join(', ');
             throw new Error("Errors during JIT compilation of template for " + facade.name + ": " + errors);
@@ -24146,7 +24404,7 @@ function publishFacade(global) {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-var VERSION$1 = new Version('7.2.6');
+var VERSION$1 = new Version('7.2.14');
 
 /**
  * @license
@@ -24596,7 +24854,8 @@ var DirectiveNormalizer = /** @class */ (function () {
     DirectiveNormalizer.prototype._preparseLoadedTemplate = function (prenormData, template, templateAbsUrl) {
         var isInline = !!prenormData.template;
         var interpolationConfig = InterpolationConfig.fromArray(prenormData.interpolation);
-        var rootNodesAndErrors = this._htmlParser.parse(template, templateSourceUrl({ reference: prenormData.ngModuleType }, { type: { reference: prenormData.componentType } }, { isInline: isInline, templateUrl: templateAbsUrl }), true, interpolationConfig);
+        var templateUrl = templateSourceUrl({ reference: prenormData.ngModuleType }, { type: { reference: prenormData.componentType } }, { isInline: isInline, templateUrl: templateAbsUrl });
+        var rootNodesAndErrors = this._htmlParser.parse(template, templateUrl, { tokenizeExpansionForms: true, interpolationConfig: interpolationConfig });
         if (rootNodesAndErrors.errors.length > 0) {
             var errorString = rootNodesAndErrors.errors.join('\n');
             throw syntaxError("Template parse errors:\n" + errorString);
@@ -25369,9 +25628,8 @@ var XmlParser = /** @class */ (function (_super) {
     function XmlParser() {
         return _super.call(this, getXmlTagDefinition) || this;
     }
-    XmlParser.prototype.parse = function (source, url, parseExpansionForms) {
-        if (parseExpansionForms === void 0) { parseExpansionForms = false; }
-        return _super.prototype.parse.call(this, source, url, parseExpansionForms);
+    XmlParser.prototype.parse = function (source, url, options) {
+        return _super.prototype.parse.call(this, source, url, options);
     };
     return XmlParser;
 }(Parser$1));
@@ -25507,7 +25765,7 @@ var XliffParser = /** @class */ (function () {
     XliffParser.prototype.parse = function (xliff, url) {
         this._unitMlString = null;
         this._msgIdToHtml = {};
-        var xml = new XmlParser().parse(xliff, url, false);
+        var xml = new XmlParser().parse(xliff, url);
         this._errors = xml.errors;
         visitAll(this, xml.rootNodes, null);
         return {
@@ -25579,7 +25837,7 @@ var XmlToI18n = /** @class */ (function () {
     function XmlToI18n() {
     }
     XmlToI18n.prototype.convert = function (message, url) {
-        var xmlIcu = new XmlParser().parse(message, url, true);
+        var xmlIcu = new XmlParser().parse(message, url, { tokenizeExpansionForms: true });
         this._errors = xmlIcu.errors;
         var i18nNodes = this._errors.length > 0 || xmlIcu.rootNodes.length == 0 ?
             [] : [].concat.apply([], Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])(visitAll(this, xmlIcu.rootNodes)));
@@ -25787,7 +26045,7 @@ var Xliff2Parser = /** @class */ (function () {
     Xliff2Parser.prototype.parse = function (xliff, url) {
         this._unitMlString = null;
         this._msgIdToHtml = {};
-        var xml = new XmlParser().parse(xliff, url, false);
+        var xml = new XmlParser().parse(xliff, url);
         this._errors = xml.errors;
         visitAll(this, xml.rootNodes, null);
         return {
@@ -25865,7 +26123,7 @@ var XmlToI18n$1 = /** @class */ (function () {
     function XmlToI18n() {
     }
     XmlToI18n.prototype.convert = function (message, url) {
-        var xmlIcu = new XmlParser().parse(message, url, true);
+        var xmlIcu = new XmlParser().parse(message, url, { tokenizeExpansionForms: true });
         this._errors = xmlIcu.errors;
         var i18nNodes = this._errors.length > 0 || xmlIcu.rootNodes.length == 0 ?
             [] : [].concat.apply([], Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])(visitAll(this, xmlIcu.rootNodes)));
@@ -26013,7 +26271,7 @@ var XtbParser = /** @class */ (function () {
         this._msgIdToHtml = {};
         // We can not parse the ICU messages at this point as some messages might not originate
         // from Angular that could not be lex'd.
-        var xml = new XmlParser().parse(xtb, url, false);
+        var xml = new XmlParser().parse(xtb, url);
         this._errors = xml.errors;
         visitAll(this, xml.rootNodes);
         return {
@@ -26074,7 +26332,7 @@ var XmlToI18n$2 = /** @class */ (function () {
     function XmlToI18n() {
     }
     XmlToI18n.prototype.convert = function (message, url) {
-        var xmlIcu = new XmlParser().parse(message, url, true);
+        var xmlIcu = new XmlParser().parse(message, url, { tokenizeExpansionForms: true });
         this._errors = xmlIcu.errors;
         var i18nNodes = this._errors.length > 0 || xmlIcu.rootNodes.length == 0 ?
             [] :
@@ -26175,7 +26433,7 @@ var I18nToHtmlVisitor = /** @class */ (function () {
         var text = this._convertToText(srcMsg);
         // text to html
         var url = srcMsg.nodes[0].sourceSpan.start.file.url;
-        var html = new HtmlParser().parse(text, url, true);
+        var html = new HtmlParser().parse(text, url, { tokenizeExpansionForms: true });
         return {
             nodes: html.rootNodes,
             errors: Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])(this._errors, html.errors),
@@ -26300,10 +26558,10 @@ var I18NHtmlParser = /** @class */ (function () {
                 new TranslationBundle({}, null, digest, undefined, missingTranslation, console);
         }
     }
-    I18NHtmlParser.prototype.parse = function (source, url, parseExpansionForms, interpolationConfig) {
-        if (parseExpansionForms === void 0) { parseExpansionForms = false; }
-        if (interpolationConfig === void 0) { interpolationConfig = DEFAULT_INTERPOLATION_CONFIG; }
-        var parseResult = this._htmlParser.parse(source, url, parseExpansionForms, interpolationConfig);
+    I18NHtmlParser.prototype.parse = function (source, url, options) {
+        if (options === void 0) { options = {}; }
+        var interpolationConfig = options.interpolationConfig || DEFAULT_INTERPOLATION_CONFIG;
+        var parseResult = this._htmlParser.parse(source, url, Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])({ interpolationConfig: interpolationConfig }, options));
         if (parseResult.errors.length) {
             return new ParseTreeResult(parseResult.rootNodes, parseResult.errors);
         }
@@ -28988,7 +29246,10 @@ var TemplateParser = /** @class */ (function () {
     };
     TemplateParser.prototype.tryParse = function (component, template, directives, pipes, schemas, templateUrl, preserveWhitespaces) {
         var htmlParseResult = typeof template === 'string' ?
-            this._htmlParser.parse(template, templateUrl, true, this.getInterpolationConfig(component)) :
+            this._htmlParser.parse(template, templateUrl, {
+                tokenizeExpansionForms: true,
+                interpolationConfig: this.getInterpolationConfig(component)
+            }) :
             template;
         if (!preserveWhitespaces) {
             htmlParseResult = removeWhitespaces(htmlParseResult);
@@ -30830,7 +31091,7 @@ var MessageBundle = /** @class */ (function () {
     }
     MessageBundle.prototype.updateFromTemplate = function (html, url, interpolationConfig) {
         var _a;
-        var htmlParserResult = this._htmlParser.parse(html, url, true, interpolationConfig);
+        var htmlParserResult = this._htmlParser.parse(html, url, { tokenizeExpansionForms: true, interpolationConfig: interpolationConfig });
         if (htmlParserResult.errors.length) {
             return htmlParserResult.errors;
         }
@@ -31416,16 +31677,16 @@ var StaticSymbolResolver = /** @class */ (function () {
                             return {
                                 __symbolic: 'error',
                                 message: "Could not resolve " + module + " relative to " + self.host.getMetadataFor(sourceSymbol.filePath) + ".",
-                                line: map.line,
-                                character: map.character,
+                                line: map['line'],
+                                character: map['character'],
                                 fileName: getOriginalName()
                             };
                         }
                         return {
                             __symbolic: 'resolved',
                             symbol: self.getStaticSymbol(filePath, name_1),
-                            line: map.line,
-                            character: map.character,
+                            line: map['line'],
+                            character: map['character'],
                             fileName: getOriginalName()
                         };
                     }
@@ -31746,7 +32007,7 @@ var ToJsonSerializer = /** @class */ (function (_super) {
      */
     ToJsonSerializer.prototype.visitStringMap = function (map, context) {
         if (map['__symbolic'] === 'resolved') {
-            return visitValue(map.symbol, this, context);
+            return visitValue(map['symbol'], this, context);
         }
         if (map['__symbolic'] === 'error') {
             delete map['line'];
@@ -35861,7 +36122,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/_esm5/index.js");
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/_esm5/operators/index.js");
 /**
- * @license Angular v7.2.6
+ * @license Angular v7.2.14
  * (c) 2010-2019 Google LLC. https://angular.io/
  * License: MIT
  */
@@ -36317,6 +36578,7 @@ var ChangeDetectionStrategy;
      * Use the `CheckOnce` strategy, meaning that automatic change detection is deactivated
      * until reactivated by setting the strategy to `Default` (`CheckAlways`).
      * Change detection can still be explicitly invoked.
+     * This strategy applies to all child directives and cannot be overridden.
      */
     ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
     /**
@@ -36524,18 +36786,18 @@ function resolveForwardRef(type) {
  *   selector: 'my-comp',
  *   templateUrl: 'my-comp.html', // This requires asynchronous resolution
  * })
- * class MyComponnent{
+ * class MyComponent{
  * }
  *
- * // Calling `renderComponent` will fail because `MyComponent`'s `@Compenent.templateUrl`
- * // needs to be resolved because `renderComponent` is synchronous process.
- * // renderComponent(MyComponent);
+ * // Calling `renderComponent` will fail because `renderComponent` is a synchronous process
+ * // and `MyComponent`'s `@Component.templateUrl` needs to be resolved asynchronously.
  *
- * // Calling `resolveComponentResources` will resolve `@Compenent.templateUrl` into
- * // `@Compenent.template`, which would allow `renderComponent` to proceed in synchronous manner.
- * // Use browser's `fetch` function as the default resource resolution strategy.
+ * // Calling `resolveComponentResources()` will resolve `@Component.templateUrl` into
+ * // `@Component.template`, which allows `renderComponent` to proceed in a synchronous manner.
+ *
+ * // Use browser's `fetch()` function as the default resource resolution strategy.
  * resolveComponentResources(fetch).then(() => {
- *   // After resolution all URLs have been converted into strings.
+ *   // After resolution all URLs have been converted into `template` strings.
  *   renderComponent(MyComponent);
  * });
  *
@@ -36544,8 +36806,8 @@ function resolveForwardRef(type) {
  * NOTE: In AOT the resolution happens during compilation, and so there should be no need
  * to call this method outside JIT mode.
  *
- * @param resourceResolver a function which is responsible to returning a `Promise` of the resolved
- * URL. Browser's `fetch` method is a good default implementation.
+ * @param resourceResolver a function which is responsible for returning a `Promise` to the
+ * contents of the resolved URL. Browser's `fetch()` method is a good default implementation.
  */
 function resolveComponentResources(resourceResolver) {
     // Store all promises which are fetching the resources.
@@ -37512,7 +37774,7 @@ var R3ResolvedDependencyType;
  * found in the LICENSE file at https://angular.io/license
  */
 function getCompilerFacade() {
-    var globalNg = _global.ng;
+    var globalNg = _global['ng'];
     if (!globalNg || !globalNg.ɵcompilerFacade) {
         throw new Error("Angular JIT compilation failed: '@angular/compiler' not loaded!\n" +
             "  - JIT compilation is discouraged for production use-cases! Consider AOT mode instead.\n" +
@@ -40968,7 +41230,7 @@ function updateStylingMap(context, classesInput, stylesInput, directiveRef) {
     var classesValue = classesPlayerBuilder ?
         classesInput.value :
         classesInput;
-    var stylesValue = stylesPlayerBuilder ? stylesInput.value : stylesInput;
+    var stylesValue = stylesPlayerBuilder ? stylesInput['value'] : stylesInput;
     // early exit (this is what's done to avoid using ctx.bind() to cache the value)
     var ignoreAllClassUpdates = limitToSingleClasses(context) || classesValue === NO_CHANGE ||
         classesValue === context[6 /* CachedClassValueOrInitialClassString */];
@@ -46605,7 +46867,7 @@ var Version = /** @class */ (function () {
 /**
  * @publicApi
  */
-var VERSION = new Version('7.2.6');
+var VERSION = new Version('7.2.14');
 
 /**
  * @license
@@ -47041,7 +47303,7 @@ function isDOMParserAvailable() {
  * execution if used in URL context within a HTML document. Specifically, this
  * regular expression matches if (comment from here on and regex copied from
  * Soy's EscapingConventions):
- * (1) Either a protocol in a whitelist (http, https, mailto or ftp).
+ * (1) Either an allowed protocol (http, https, mailto or ftp).
  * (2) or no protocol.  A protocol must be followed by a colon. The below
  *     allows that by allowing colons only after one of the characters [/?#].
  *     A colon after a hash (#) must be in the fragment.
@@ -47163,6 +47425,12 @@ var HTML_ATTRS = tagSet('abbr,accesskey,align,alt,autoplay,axis,bgcolor,border,c
 // can be sanitized, but they increase security surface area without a legitimate use case, so they
 // are left out here.
 var VALID_ATTRS = merge$1(URI_ATTRS, SRCSET_ATTRS, HTML_ATTRS);
+// Elements whose content should not be traversed/preserved, if the elements themselves are invalid.
+//
+// Typically, `<invalid>Some content</invalid>` would traverse (and in this case preserve)
+// `Some content`, but strip `invalid-element` opening/closing tags. For some elements, though, we
+// don't want to preserve the content, if the elements themselves are going to be removed.
+var SKIP_TRAVERSING_CONTENT_IF_INVALID_ELEMENTS = tagSet('script,style,template');
 /**
  * SanitizingHtmlSerializer serializes a DOM fragment, stripping out any unsafe elements and unsafe
  * attributes.
@@ -47179,10 +47447,10 @@ var SanitizingHtmlSerializer = /** @class */ (function () {
         // However this code never accesses properties off of `document` before deleting its contents
         // again, so it shouldn't be vulnerable to DOM clobbering.
         var current = el.firstChild;
-        var elementValid = true;
+        var traverseContent = true;
         while (current) {
             if (current.nodeType === Node.ELEMENT_NODE) {
-                elementValid = this.startElement(current);
+                traverseContent = this.startElement(current);
             }
             else if (current.nodeType === Node.TEXT_NODE) {
                 this.chars(current.nodeValue);
@@ -47191,7 +47459,7 @@ var SanitizingHtmlSerializer = /** @class */ (function () {
                 // Strip non-element, non-text nodes.
                 this.sanitizedSomething = true;
             }
-            if (elementValid && current.firstChild) {
+            if (traverseContent && current.firstChild) {
                 current = current.firstChild;
                 continue;
             }
@@ -47211,18 +47479,18 @@ var SanitizingHtmlSerializer = /** @class */ (function () {
         return this.buf.join('');
     };
     /**
-     * Outputs only valid Elements.
+     * Sanitizes an opening element tag (if valid) and returns whether the element's contents should
+     * be traversed. Element content must always be traversed (even if the element itself is not
+     * valid/safe), unless the element is one of `SKIP_TRAVERSING_CONTENT_IF_INVALID_ELEMENTS`.
      *
-     * Invalid elements are skipped.
-     *
-     * @param element element to sanitize
-     * Returns true if the element is valid.
+     * @param element The element to sanitize.
+     * @return True if the element's contents should be traversed.
      */
     SanitizingHtmlSerializer.prototype.startElement = function (element) {
         var tagName = element.nodeName.toLowerCase();
         if (!VALID_ELEMENTS.hasOwnProperty(tagName)) {
             this.sanitizedSomething = true;
-            return false;
+            return !SKIP_TRAVERSING_CONTENT_IF_INVALID_ELEMENTS.hasOwnProperty(tagName);
         }
         this.buf.push('<');
         this.buf.push(tagName);
@@ -47955,6 +48223,9 @@ function readUpdateOpCodes(updateOpCodes, icus, bindingsStartIndex, changeMask, 
                     }
                     else {
                         var nodeIndex = opCode >>> 2 /* SHIFT_REF */;
+                        var tIcuIndex = void 0;
+                        var tIcu = void 0;
+                        var icuTNode = void 0;
                         switch (opCode & 3 /* MASK_OPCODE */) {
                             case 1 /* Attr */:
                                 var attrName = updateOpCodes[++j];
@@ -47965,9 +48236,9 @@ function readUpdateOpCodes(updateOpCodes, icus, bindingsStartIndex, changeMask, 
                                 textBinding(nodeIndex, value);
                                 break;
                             case 2 /* IcuSwitch */:
-                                var tIcuIndex = updateOpCodes[++j];
-                                var tIcu = icus[tIcuIndex];
-                                var icuTNode = getTNode(nodeIndex, viewData);
+                                tIcuIndex = updateOpCodes[++j];
+                                tIcu = icus[tIcuIndex];
+                                icuTNode = getTNode(nodeIndex, viewData);
                                 // If there is an active case, delete the old nodes
                                 if (icuTNode.activeCaseIndex !== null) {
                                     var removeCodes = tIcu.remove[icuTNode.activeCaseIndex];
@@ -51245,7 +51516,7 @@ var initializeBaseDef = function (target) {
     }
 };
 /**
- * Does the work of creating the `ngBaseDef` property for the @Input and @Output decorators.
+ * Does the work of creating the `ngBaseDef` property for the `Input` and `Output` decorators.
  * @param key "inputs" or "outputs"
  */
 var updateBaseDefFromIOProp = function (getProp) {
@@ -60365,7 +60636,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/common */ "./node_modules/@angular/common/fesm5/common.js");
 /* harmony import */ var _angular_platform_browser__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/platform-browser */ "./node_modules/@angular/platform-browser/fesm5/platform-browser.js");
 /**
- * @license Angular v7.2.6
+ * @license Angular v7.2.14
  * (c) 2010-2019 Google LLC. https://angular.io/
  * License: MIT
  */
@@ -60802,7 +61073,7 @@ var CachedResourceLoader = /** @class */ (function (_super) {
 /**
  * @publicApi
  */
-var VERSION = new _angular_core__WEBPACK_IMPORTED_MODULE_1__["Version"]('7.2.6');
+var VERSION = new _angular_core__WEBPACK_IMPORTED_MODULE_1__["Version"]('7.2.14');
 
 /**
  * @license
@@ -60912,7 +61183,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/common */ "./node_modules/@angular/common/fesm5/common.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /**
- * @license Angular v7.2.6
+ * @license Angular v7.2.14
  * (c) 2010-2019 Google LLC. https://angular.io/
  * License: MIT
  */
@@ -61912,9 +62183,10 @@ function decoratePreventDefault(eventHandler) {
     };
 }
 var DomRendererFactory2 = /** @class */ (function () {
-    function DomRendererFactory2(eventManager, sharedStylesHost) {
+    function DomRendererFactory2(eventManager, sharedStylesHost, appId) {
         this.eventManager = eventManager;
         this.sharedStylesHost = sharedStylesHost;
+        this.appId = appId;
         this.rendererByCompId = new Map();
         this.defaultRenderer = new DefaultDomRenderer2(eventManager);
     }
@@ -61926,8 +62198,7 @@ var DomRendererFactory2 = /** @class */ (function () {
             case _angular_core__WEBPACK_IMPORTED_MODULE_2__["ViewEncapsulation"].Emulated: {
                 var renderer = this.rendererByCompId.get(type.id);
                 if (!renderer) {
-                    renderer =
-                        new EmulatedEncapsulationDomRenderer2(this.eventManager, this.sharedStylesHost, type);
+                    renderer = new EmulatedEncapsulationDomRenderer2(this.eventManager, this.sharedStylesHost, type, this.appId);
                     this.rendererByCompId.set(type.id, renderer);
                 }
                 renderer.applyToHost(element);
@@ -61950,7 +62221,8 @@ var DomRendererFactory2 = /** @class */ (function () {
     DomRendererFactory2.prototype.end = function () { };
     DomRendererFactory2 = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_2__["Injectable"])(),
-        Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"])("design:paramtypes", [EventManager, DomSharedStylesHost])
+        Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__param"])(2, Object(_angular_core__WEBPACK_IMPORTED_MODULE_2__["Inject"])(_angular_core__WEBPACK_IMPORTED_MODULE_2__["APP_ID"])),
+        Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"])("design:paramtypes", [EventManager, DomSharedStylesHost, String])
     ], DomRendererFactory2);
     return DomRendererFactory2;
 }());
@@ -62063,13 +62335,13 @@ function checkNoSyntheticProp(name, nameKind) {
 }
 var EmulatedEncapsulationDomRenderer2 = /** @class */ (function (_super) {
     Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__extends"])(EmulatedEncapsulationDomRenderer2, _super);
-    function EmulatedEncapsulationDomRenderer2(eventManager, sharedStylesHost, component) {
+    function EmulatedEncapsulationDomRenderer2(eventManager, sharedStylesHost, component, appId) {
         var _this = _super.call(this, eventManager) || this;
         _this.component = component;
-        var styles = flattenStyles(component.id, component.styles, []);
+        var styles = flattenStyles(appId + '-' + component.id, component.styles, []);
         sharedStylesHost.addStyles(styles);
-        _this.contentAttr = shimContentAttribute(component.id);
-        _this.hostAttr = shimHostAttribute(component.id);
+        _this.contentAttr = shimContentAttribute(appId + '-' + component.id);
+        _this.hostAttr = shimHostAttribute(appId + '-' + component.id);
         return _this;
     }
     EmulatedEncapsulationDomRenderer2.prototype.applyToHost = function (element) { _super.prototype.setAttribute.call(this, element, this.hostAttr, ''); };
@@ -62868,7 +63140,7 @@ var BROWSER_MODULE_PROVIDERS = [
     {
         provide: DomRendererFactory2,
         useClass: DomRendererFactory2,
-        deps: [EventManager, DomSharedStylesHost]
+        deps: [EventManager, DomSharedStylesHost, _angular_core__WEBPACK_IMPORTED_MODULE_2__["APP_ID"]]
     },
     { provide: _angular_core__WEBPACK_IMPORTED_MODULE_2__["RendererFactory2"], useExisting: DomRendererFactory2 },
     { provide: SharedStylesHost, useExisting: DomSharedStylesHost },
@@ -63385,7 +63657,7 @@ var By = /** @class */ (function () {
 /**
  * @publicApi
  */
-var VERSION = new _angular_core__WEBPACK_IMPORTED_MODULE_2__["Version"]('7.2.6');
+var VERSION = new _angular_core__WEBPACK_IMPORTED_MODULE_2__["Version"]('7.2.14');
 
 /**
  * @license
