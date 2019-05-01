@@ -92,8 +92,10 @@ export class AppComponent implements OnInit {
         this.numReviews=data['0']['numOfReviews'];
         this.rotten = data['0']['rotten'];
         this.fresh = data['0']['fresh'];
+
         var aCriticReview = Math.floor((Math.random() * data.length));
         this.criticConsensus = data[aCriticReview]['review_text'];
+
         if (this.tomotoMeter > 75) {
           this.criticRatingImg = environment.cdn + 'assets/img/large-certified.png';
         } else if (this.tomotoMeter >= 55 && this.tomotoMeter<75) {
